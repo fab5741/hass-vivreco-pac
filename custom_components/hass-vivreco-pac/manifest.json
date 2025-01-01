@@ -1,0 +1,11 @@
+{
+    "domain": "hass-vivreco-pac",
+    "name": "Vivreco PAC",
+    "version": "0.1.0",
+    "requirements": ["aiohttp"],
+    "dependencies": [],
+    "codeowners": ["@fab5741"],
+    "config_flow": false,
+    "documentation": "https://github.com/fab5741/hass-vivreco-pac",
+    "issue_tracker": "https://github.com/fab5741/hass-vivreco-pac/issues"
+}
