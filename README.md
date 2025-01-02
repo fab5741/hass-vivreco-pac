@@ -66,7 +66,6 @@ Ce projet est distribué sous la licence MIT. Consultez le fichier LICENSE pour 
 
 <!-- Badges -->
 
-[hacs-url]: https://github.com/hacs/integration
 [hacs-badge]: https://img.shields.io/badge/hacs-default-orange.svg?style=flat-square
 [release-badge]: https://img.shields.io/github/v/release/fab5741/hass-vivreco-pac?style=flat-square
 [downloads-badge]: https://img.shields.io/github/downloads/fab5741/hass-vivreco-pac/total?style=flat-square
@@ -75,3 +74,5 @@ Ce projet est distribué sous la licence MIT. Consultez le fichier LICENSE pour 
 <!-- Links -->
 [home-assistant]: https://www.home-assistant.io/
 [vivreco]: https://www.vivreco.fr/
+[hacs-url]: https://github.com/hacs/integration
+[release-url]: https://github.com/fab5741/hass-vivreco-pac/releases

@@ -1,5 +1,5 @@
 {
-  "name": "Vivreco PAC",
-  "content_in_root": false,
-  "country": ["FR"]
-}
+    "name": "Vivreco pac",
+    "content_in_root": true,
+    "country": ["FR"]
+  }
