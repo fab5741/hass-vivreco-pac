@@ -1,8 +1,6 @@
-import logging
+import voluptuous as vol
+from homeassistant.helpers import config_validation as cv
 
-_LOGGER = logging.getLogger(__name__)
+DOMAIN = "hass-vivreco-pac"
 
-async def async_setup(hass, config):
-    """Set up the vivreco_pac integration."""
-    hass.data["hass-vivreco-pac"] = {}
-    return True
+CONFIG_SCHEMA = cv.config_entry_only_config_schema(DOMAIN)
