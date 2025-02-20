@@ -1,7 +1,7 @@
 {
     "domain": "hass-vivreco-pac",
     "name": "Vivreco PAC",
-    "version": "0.1.0",
+    "version": "1.1",
     "requirements": ["aiohttp"],
     "dependencies": [],
     "codeowners": ["@fab5741"],

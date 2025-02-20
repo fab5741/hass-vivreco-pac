@@ -14,6 +14,7 @@ API_BASE_URL = "https://vivrecocontrol.com/api/v1"
 API_LOGIN_URL = f"{API_BASE_URL}/herja/login"
 API_USER_URL = f"{API_BASE_URL}/herja/user/me"
 API_CHART_URL_TEMPLATE = f"{API_BASE_URL}/charts/{{hp_id}}/dashboard"
+API_ENERGY_URL_TEMPLATE = f"{API_BASE_URL}/commands/{{hp_id}}/values/energy_meters"
 
 # Intervalle de récupération des données (en minutes)
 DEFAULT_UPDATE_INTERVAL = 5
@@ -50,6 +51,10 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
         elif sensor_key in ["t_ecs", "cons_t_int", "t_int", "cons_t_ecs", "t_ext"]:
             sensors.append(VivrecoTemperatureSensor(coordinator, sensor_key, label, SensorDeviceClass.TEMPERATURE))
 
+    sensors.append(VivrecoConsumptionSensor(coordinator, 'ch_wh', 'ch_wh'))    
+    sensors.append(VivrecoConsumptionSensor(coordinator, 'ecs_wh', 'ecs_wh'))    
+    sensors.append(VivrecoConsumptionSensor(coordinator, 'other_wh', 'other_wh'))    
+    
     async_add_entities(sensors)
 
 class VivrecoDataUpdateCoordinator(DataUpdateCoordinator):
@@ -70,7 +75,8 @@ class VivrecoDataUpdateCoordinator(DataUpdateCoordinator):
         )
         self.data = {
             "values": {},
-            "labels": {}
+            "labels": {},
+            "energy": {},
         }
 
     async def _async_update_data(self):
@@ -85,6 +91,7 @@ class VivrecoDataUpdateCoordinator(DataUpdateCoordinator):
 
         # Construire l'URL de l'API avec l'identifiant de la PAC
         api_chart_url = API_CHART_URL_TEMPLATE.format(hp_id=self.hp_id)
+        api_energy_url = API_ENERGY_URL_TEMPLATE.format(hp_id=self.hp_id)
 
         headers = {"Authorization": f"Bearer {self.api_token}"}
         try:
@@ -102,6 +109,27 @@ class VivrecoDataUpdateCoordinator(DataUpdateCoordinator):
                     
                     _LOGGER.debug(f"Données API récupérées : {api_data}")  # Log des données récupérées
                     self.data = api_data["elements"]
+        
+        except aiohttp.ClientError as e:
+            _LOGGER.error(f"Erreur lors de la communication avec l'API : {e}")
+        except Exception as e:
+            _LOGGER.error(f"Erreur lors de la conversion de la réponse JSON : {e}")
+
+        try:
+            async with aiohttp.ClientSession() as session:
+                async with session.get(api_energy_url, headers=headers) as response:
+                    if response.status != 200:
+                        _LOGGER.error(f"Erreur API : {response.status}")
+                        return self.data
+                    
+                    # Tentative de récupération des données JSON
+                    api_data = await response.json()
+                    if "elements" not in api_data:
+                        _LOGGER.error("Aucune donnée 'elements' trouvée dans la réponse de l'API.")
+                        return self.data
+                    
+                    _LOGGER.debug(f"Données API récupérées : {api_data}")  # Log des données récupérées
+                    self.data['energy'] = api_data["values"]["values"]["energyValues"]["total"]
         
         except aiohttp.ClientError as e:
             _LOGGER.error(f"Erreur lors de la communication avec l'API : {e}")
@@ -231,7 +259,7 @@ class VivrecoStateSensor(SensorEntity):
             "arret": "Inactive",  
         }
         
-        return state_mapping.get(state_value, "Inconnu")  # Si l'état n'est pas défini, retourner "Inconnu"
+        return state_mapping.get(state_value, "Inconnu")
 
     @property
     def unique_id(self):
@@ -261,3 +289,17 @@ class VivrecoCompSensor(BinarySensorEntity):
     def unique_id(self):
         """Retourne l'identifiant unique du capteur."""
         return f"vivreco_{self._sensor_key}"
+
+class VivrecoConsumptionSensor(VivrecoSensor):
+    """Représentation d'un capteur de consommation quotidienne Vivreco."""
+
+    @property
+    def unit_of_measurement(self):
+        """Retourne l'unité de mesure (kWh pour la consommation)."""
+        return "kWh"
+
+    @property
+    def state(self):
+        """Retourne la consommation quotidienne en kWh."""
+        ch_consumption = self.coordinator.data["energy"]["values"]["values"]["energyValues"]["total"]
+        return ch_consumption if ch_consumption is not None else "N/A"
