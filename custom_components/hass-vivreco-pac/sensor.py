@@ -51,10 +51,10 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
         elif sensor_key in ["t_ecs", "cons_t_int", "t_int", "cons_t_ecs", "t_ext"]:
             sensors.append(VivrecoTemperatureSensor(coordinator, sensor_key, label, SensorDeviceClass.TEMPERATURE))
 
-    sensors.append(VivrecoConsumptionSensor(coordinator, 'ch_wh', 'ch_wh'))    
-    sensors.append(VivrecoConsumptionSensor(coordinator, 'ecs_wh', 'ecs_wh'))    
-    sensors.append(VivrecoConsumptionSensor(coordinator, 'other_wh', 'other_wh'))    
-    
+    sensors.append(VivrecoConsumptionSensor(coordinator, 'ch_wh', 'ch_wh', 0, SensorDeviceClass.ENERGY))    
+    sensors.append(VivrecoConsumptionSensor(coordinator, 'ecs_wh', 'ecs_wh', 1, SensorDeviceClass.ENERGY))    
+    sensors.append(VivrecoConsumptionSensor(coordinator, 'other_wh', 'other_wh', 2, SensorDeviceClass.ENERGY))    
+
     async_add_entities(sensors)
 
 class VivrecoDataUpdateCoordinator(DataUpdateCoordinator):
@@ -100,16 +100,15 @@ class VivrecoDataUpdateCoordinator(DataUpdateCoordinator):
                     if response.status != 200:
                         _LOGGER.error(f"Erreur API : {response.status}")
                         return self.data
-                    
-                    # Tentative de récupération des données JSON
+
                     api_data = await response.json()
                     if "elements" not in api_data:
                         _LOGGER.error("Aucune donnée 'elements' trouvée dans la réponse de l'API.")
                         return self.data
-                    
-                    _LOGGER.debug(f"Données API récupérées : {api_data}")  # Log des données récupérées
+
+                    _LOGGER.debug(f"Données API récupérées : {api_data}")
                     self.data = api_data["elements"]
-        
+
         except aiohttp.ClientError as e:
             _LOGGER.error(f"Erreur lors de la communication avec l'API : {e}")
         except Exception as e:
@@ -121,22 +120,26 @@ class VivrecoDataUpdateCoordinator(DataUpdateCoordinator):
                     if response.status != 200:
                         _LOGGER.error(f"Erreur API : {response.status}")
                         return self.data
-                    
-                    # Tentative de récupération des données JSON
+
                     api_data = await response.json()
-                    if "elements" not in api_data:
-                        _LOGGER.error("Aucune donnée 'elements' trouvée dans la réponse de l'API.")
-                        return self.data
-                    
-                    _LOGGER.debug(f"Données API récupérées : {api_data}")  # Log des données récupérées
-                    self.data['energy'] = api_data["values"]["values"]["energyValues"]["total"]
-        
+                    _LOGGER.debug(f"Données API énergie récupérées : {api_data}")
+
+                    # Vérifier si "values" est une liste ou un dictionnaire
+                    if isinstance(api_data.get("values"), list):
+                        for item in api_data["values"]:
+                            if "energyValues" in item:
+                                self.data['energy'] = item["energyValues"]["total"]
+                                break
+                    else:
+                        self.data['energy'] = api_data["values"].get("values", {}).get("energyValues", {}).get("total")
+
         except aiohttp.ClientError as e:
             _LOGGER.error(f"Erreur lors de la communication avec l'API : {e}")
         except Exception as e:
             _LOGGER.error(f"Erreur lors de la conversion de la réponse JSON : {e}")
 
         return self.data
+
 
     async def _async_login(self):
         """Effectue la connexion via Basic Auth et récupère le token API."""
@@ -293,13 +296,27 @@ class VivrecoCompSensor(BinarySensorEntity):
 class VivrecoConsumptionSensor(VivrecoSensor):
     """Représentation d'un capteur de consommation quotidienne Vivreco."""
 
+    def __init__(self, coordinator, sensor_key, name, energy_type, device_class=None):
+        """Initialisation du capteur avec un nom et un type d'énergie spécifique."""
+        # Appel du constructeur parent
+        super().__init__(coordinator, sensor_key, name, device_class)
+        self.energy_type = energy_type  # Stocke le type d'énergie
+
     @property
     def unit_of_measurement(self):
         """Retourne l'unité de mesure (kWh pour la consommation)."""
         return "kWh"
+    
+    @property
+    def state_class(self):
+        return "total_increasing"  # Indique que c'est un compteur cumulatif
+
+    def get_consumption(self):
+        """Retourne la consommation pour un type d'énergie donné (ch, ecs, other)."""
+        ch_consumption = self.coordinator.data["energy"][self.energy_type]['y']
+        return ch_consumption if ch_consumption is not None else "N/A"
 
     @property
     def state(self):
-        """Retourne la consommation quotidienne en kWh."""
-        ch_consumption = self.coordinator.data["energy"]["values"]["values"]["energyValues"]["total"]
-        return ch_consumption if ch_consumption is not None else "N/A"
+        """Retourne la consommation quotidienne en kWh pour le chauffage (ch)."""
+        return self.get_consumption()
