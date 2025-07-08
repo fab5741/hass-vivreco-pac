@@ -7,6 +7,7 @@
 
 [![hacs_badge](https://img.shields.io/badge/HACS-Custom-41BDF5.svg)](https://github.com/hacs/integration)
 [![HACS validation](https://github.com/fab5741/hass-vivreco-pac/workflows/HACS%20validation/badge.svg)](https://github.com/fab5741/hass-vivreco-pac/actions?query=workflow:"HACS+validation")
+[![HACS validation](https://github.com/nidebr/hass-vivreco-pac/workflows/HACS%20validation/badge.svg)](https://github.com/nidebr/hass-vivreco-pac/actions?query=workflow:"HACS+validation")
 [![Validate with hassfest](https://github.com/fab5741/hass-vivreco-pac/workflows/Validate%20with%20hassfest/badge.svg)](https://github.com/fab5741/hass-vivreco-pac/actions?query=workflow:"Validate+with+hassfest")
 [![Validate with hassfest](https://github.com/nidebr/hass-vivreco-pac/workflows/Validate%20with%20hassfest/badge.svg)](https://github.com/nidebr/hass-vivreco-pac/actions?query=workflow:"Validate+with+hassfest")
 
