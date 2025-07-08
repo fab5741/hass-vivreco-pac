@@ -1,44 +1,36 @@
-import logging
+"""Gère la configuration de l'intégration Vivreco PAC via l'interface UI."""
+
 import voluptuous as vol
+
 from homeassistant import config_entries
-from homeassistant.core import HomeAssistant
-from homeassistant.data_entry_flow import FlowResult
+from homeassistant.const import CONF_EMAIL, CONF_PASSWORD, CONF_SCAN_INTERVAL
 
-_LOGGER = logging.getLogger(__name__)
+from .const import DEFAULT_UPDATE_INTERVAL, DOMAIN
 
-class VivrecoConfigFlow(config_entries.ConfigFlow, domain="vivreco_pac"):
-    """Gère le flux de configuration de l'intégration Vivreco PAC."""
+
+class VivrecoConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
+    """Gérer un flux de configuration pour Vivreco PAC."""
 
     VERSION = 1
 
     async def async_step_user(self, user_input=None):
-        """Traitement de la première étape de configuration."""
-        if user_input:
-            username = user_input.get("username")
-            password = user_input.get("password")
+        """Gérer l'étape initiale."""
 
-            if not username or not password:
-                return self.async_show_form(
-                    step_id="user",
-                    data_schema=self._get_data_schema(),
-                    errors={"base": "invalid_credentials"}
-                )
+        errors = {}
 
-            # Enregistrer les informations et poursuivre
-            return self.async_create_entry(
-                title="Vivreco PAC",
-                data={"username": username, "password": password},
-            )
+        if user_input is not None:
+            return self.async_create_entry(title="Vivreco PAC", data=user_input)
 
-        return self.async_show_form(
-            step_id="user",
-            data_schema=self._get_data_schema(),
+        data_schema = vol.Schema(
+            {
+                vol.Required(CONF_EMAIL): str,
+                vol.Required(CONF_PASSWORD): str,
+                vol.Optional(
+                    CONF_SCAN_INTERVAL, default=DEFAULT_UPDATE_INTERVAL
+                ): vol.All(int, vol.Range(min=1)),
+            }
         )
 
-    def _get_data_schema(self):
-        """Retourne le schéma de la configuration du formulaire."""
-        return vol.Schema({
-            vol.Required("username"): str,
-            vol.Required("password"): str,
-        })
-
+        return self.async_show_form(
+            step_id="user", data_schema=data_schema, errors=errors
+        )

@@ -1,0 +1,15 @@
+{
+    "config": {
+        "step": {
+            "user": {
+                "data": {
+                    "email": "E-mail address",
+                    "password": "Password",
+                    "scan_interval": "Frequency of updates (in minutes)"
+                },
+                "title": "Login to Vivreco WebControl",
+                "description": "Please enter your Vivreco WebControl access credentials"
+            }
+        }
+    }
+}
