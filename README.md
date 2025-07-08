@@ -1,9 +1,14 @@
-# hass-vivreco-pac
+# Integration Vivreco Pompe à chaleur pour Home Assistant
 
-[![hacs][hacs-badge]][hacs-url]
-[![release][release-badge]][release-url]
-![downloads][downloads-badge]
-![build][build-badge]
+[![GitHub release](https://img.shields.io/github/v/release/fab5741/hass-vivreco-pac.svg?include_prereleases=&sort=semver&color=blue)](https://github.com/fab5741/hass-vivreco-pac/releases/)
+[![GH-code-size](https://img.shields.io/github/languages/code-size/fab5741/hass-vivreco-pac?color=red)](https://github.com/fab5741/hass-vivreco-pac)
+[![issues](https://img.shields.io/github/issues/fab5741/hass-vivreco-pac)](https://github.com/fab5741/hass-vivreco-pac/issues)
+[![GH-last-commit](https://img.shields.io/github/last-commit/fab5741/hass-vivreco-pac?style=flat-square)](https://github.com/fab5741/hass-vivreco-pac/commits/main)
+
+[![hacs_badge](https://img.shields.io/badge/HACS-Custom-41BDF5.svg)](https://github.com/hacs/integration)
+[![HACS validation](https://github.com/fab5741/hass-vivreco-pac/workflows/HACS%20validation/badge.svg)](https://github.com/fab5741/hass-vivreco-pac/actions?query=workflow:"HACS+validation")
+[![Validate with hassfest](https://github.com/fab5741/hass-vivreco-pac/workflows/Validate%20with%20hassfest/badge.svg)](https://github.com/fab5741/hass-vivreco-pac/actions?query=workflow:"Validate+with+hassfest")
+[![Python application](https://github.com/fab5741/hass-vivreco-pac/actions/workflows/python-app.yml/badge.svg)](https://github.com/fab5741/hass-vivreco-pac/actions/workflows/python-app.yml)
 
 Intégration non officielle pour [Home Assistant][home-assistant] permettant de connecter et de superviser les pompes à chaleur [Vivreco][vivreco]. Cette intégration récupère les données de fonctionnement et de température via l'API officielle de [Vivreco][vivreco].
 
@@ -18,22 +23,21 @@ Intégration non officielle pour [Home Assistant][home-assistant] permettant de 
 
 ## Installation
 
+### Manuelle
+
 1. Clonez ce dépôt dans le dossier `custom_components` de votre installation Home Assistant.
    ```bash
    git clone https://github.com/votre-utilisateur/hass-vivreco-pac.git custom_components/hass-vivreco-pac
 2. Redémarrez Home Assistant pour détecter l'intégration.
 
+### HACS
+
+- Installation avec "Dépôts personnalisés / custom repository" via HACS :
+   - Dépôt : https://github.com/fab5741/hass-vivreco-pac
+   - Type : Integration
+
+### 
 ---
-
-## Configuration
-
-```yaml
-sensor:                    
-  - platform: hass-vivreco-pac
-    username: "USERNAME"  # Votre email utilisé pour Vivreco
-    password: "PASSWORD"  # Votre mot de passe Vivreco
-    interval: 5           # (Optionnel) Intervalle de mise à jour des données en minutes (5 par défaut)
-```
 
 ## Exemple de capteurs disponibles
 Une fois l'intégration configurée, voici quelques capteurs que vous pourrez voir apparaître :
