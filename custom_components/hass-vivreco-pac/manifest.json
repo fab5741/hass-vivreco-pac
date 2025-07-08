@@ -7,5 +7,6 @@
     "codeowners": ["@fab5741"],
     "config_flow": true,
     "documentation": "https://github.com/fab5741/hass-vivreco-pac",
-    "issue_tracker": "https://github.com/fab5741/hass-vivreco-pac/issues"
+    "issue_tracker": "https://github.com/fab5741/hass-vivreco-pac/issues",
+    "iot_class": "cloud_polling"
 }
