@@ -1,11 +1,12 @@
 {
     "domain": "hass-vivreco-pac",
     "name": "Vivreco PAC",
-    "version": "1.1",
-    "requirements": ["aiohttp"],
-    "dependencies": [],
     "codeowners": ["@fab5741"],
-    "config_flow": false,
+    "config_flow": true,
+    "dependencies": [],
     "documentation": "https://github.com/fab5741/hass-vivreco-pac",
-    "issue_tracker": "https://github.com/fab5741/hass-vivreco-pac/issues"
+    "iot_class": "cloud_polling",
+    "issue_tracker": "https://github.com/fab5741/hass-vivreco-pac/issues",
+    "requirements": ["aiohttp"],
+    "version": "1.2"
 }
