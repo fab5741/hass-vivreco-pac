@@ -3,12 +3,90 @@
         "step": {
             "user": {
                 "data": {
-                    "email": "E-mail address",
+                    "email": "Email address",
                     "password": "Password",
-                    "scan_interval": "Frequency of updates (in minutes)"
+                    "scan_interval": "Update frequency (in minutes)"
                 },
                 "title": "Login to Vivreco WebControl",
-                "description": "Please enter your Vivreco WebControl access credentials"
+                "description": "Please enter your Vivreco WebControl login credentials"
+            }
+        }
+    },
+    "entity": {
+        "binary_sensor": {
+            "mode_ecs": {
+                "name": "DHW Mode",
+                "state": {
+                    "on": "Enabled",
+                    "off": "Disabled"
+                }
+            },
+            "mode_ch": {
+                "name": "Heating Mode",
+                "state": {
+                    "on": "Enabled",
+                    "off": "Disabled"
+                }
+            },
+            "mode_raf": {
+                "name": "Cooling Mode",
+                "state": {
+                    "on": "Enabled",
+                    "off": "Disabled"
+                }
+            },
+            "mode_appoint_elec": {
+                "name": "Electric Backup Mode",
+                "state": {
+                    "on": "Enabled",
+                    "off": "Disabled"
+                }
+            },
+            "comp_one": {
+                "name": "Compressor 1",
+                "state": {
+                    "on": "Running",
+                    "off": "Inactive"
+                }
+            }
+        },
+        "sensor": {
+            "cons_t_ecs": {
+                "name": "DHW Setpoint"
+            },
+            "t_ext": {
+                "name": "Outdoor Temperature"
+            },
+            "cons_t_int": {
+                "name": "Indoor Temperature Setpoint"
+            },
+            "t_int": {
+                "name": "Indoor Temperature"
+            },
+            "t_ecs": {
+                "name": "DHW Temperature"
+            },
+            "ch_wh": {
+                "name": "Heating"
+            },
+            "ecs_wh": {
+                "name": "DHW"
+            },
+            "other_wh": {
+                "name": "Other"
+            },
+            "raf_wh": {
+                "name": "Cooling"
+            },
+            "state": {
+                "name": "State",
+                "state": {
+                    "bt": "Heating",
+                    "degi": "Defrost",
+                    "raf": "Cooling",
+                    "ecs": "DHW",
+                    "arret": "Stopped"
+                }
             }
         }
     }
