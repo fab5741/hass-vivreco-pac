@@ -1,0 +1,93 @@
+{
+    "config": {
+        "step": {
+            "user": {
+                "data": {
+                    "email": "Adresse email",
+                    "password": "Mot de passe",
+                    "scan_interval": "Fréquence des mises à jour (en minute)"
+                },
+                "title": "Connexion à Vivreco WebControl",
+                "description": "Veuillez saisir vos identifiants d'accès à Vivreco WebControl"
+            }
+        }
+    },
+    "entity": {
+        "binary_sensor": {
+            "mode_ecs": {
+                "name": "Mode ECS",
+                "state": {
+                    "on": "Activé",
+                    "off": "Désactivé"
+                }
+            },
+            "mode_ch": {
+                "name": "Mode chauffage",
+                "state": {
+                    "on": "Activé",
+                    "off": "Désactivé"
+                }
+            },
+            "mode_raf": {
+                "name": "Mode rafraîchissement",
+                "state": {
+                    "on": "Activé",
+                    "off": "Désactivé"
+                }
+            },
+            "mode_appoint_elec": {
+                "name": "Mode appoint électrique",
+                "state": {
+                    "on": "Activé",
+                    "off": "Désactivé"
+                }
+            },
+            "comp_one": {
+                "name": "Compresseur 1",
+                "state": {
+                    "on": "En fonctionnement",
+                    "off": "Inactif"
+                }
+            }
+        },
+        "sensor": {
+            "cons_t_ecs": {
+                "name": "Consigne ECS"
+            },
+            "t_ext": {
+                "name": "Température extérieure"
+            },
+            "cons_t_int": {
+                "name": "Consigne température intérieure"
+            },
+            "t_int": {
+                "name": "Température intérieure"
+            },
+            "t_ecs": {
+                "name": "Température ECS"
+            },
+            "ch_wh": {
+                "name": "Chauffage"
+            },
+            "ecs_wh": {
+                "name": "ECS"
+            },
+            "other_wh": {
+                "name": "Autre"
+            },
+            "raf_wh": {
+                "name": "Rafraîchissement"
+            },
+            "state": {
+                "name": "État",
+                "state": {
+                    "bt": "Chauffage",
+                    "degi": "Dégivrage",
+                    "raf": "Rafraîchissement",
+                    "ecs": "ECS",
+                    "arret": "Arrêt"
+                }
+            }
+        }
+    }
+}

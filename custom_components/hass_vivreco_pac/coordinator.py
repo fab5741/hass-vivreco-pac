@@ -14,6 +14,7 @@ from .const import (
     API_CHART_URL_TEMPLATE,
     API_ENERGY_URL_TEMPLATE,
     API_LOGIN_URL,
+    API_SETTINGS_URL_TEMPLATE,
     API_USER_URL,
 )
 
@@ -42,6 +43,7 @@ class VivrecoDataUpdateCoordinator(DataUpdateCoordinator):
             "values": {},
             "labels": {},
             "energy": {},
+            "settings": {},
         }
 
     async def _async_update_data(self):
@@ -59,6 +61,7 @@ class VivrecoDataUpdateCoordinator(DataUpdateCoordinator):
         # Construire l'URL de l'API avec l'identifiant de la PAC
         api_chart_url = API_CHART_URL_TEMPLATE.format(hp_id=self.hp_id)
         api_energy_url = API_ENERGY_URL_TEMPLATE.format(hp_id=self.hp_id)
+        api_settings_url = API_SETTINGS_URL_TEMPLATE.format(hp_id=self.hp_id)
 
         headers = {"Authorization": f"Bearer {self.api_token}"}
         try:
@@ -71,7 +74,7 @@ class VivrecoDataUpdateCoordinator(DataUpdateCoordinator):
                     api_data = await response.json()
                     if "elements" not in api_data:
                         _LOGGER.error(
-                            "Aucune donnée 'elements' trouvée dans la réponse de l'API."
+                            "Aucune donnée 'elements' trouvée dans la réponse de l'API"
                         )
                         return self.data
 
@@ -112,6 +115,29 @@ class VivrecoDataUpdateCoordinator(DataUpdateCoordinator):
         except Exception as e:  # noqa: BLE001
             _LOGGER.error(f"Erreur lors de la conversion de la réponse JSON : {e}")  # noqa: G004
 
+        try:
+            async with aiohttp.ClientSession() as session:  # noqa: SIM117
+                async with session.get(api_settings_url, headers=headers) as response:
+                    if response.status != 200:
+                        _LOGGER.error(f"Erreur API : {response.status}")  # noqa: G004
+                        return self.data
+
+                    api_data = await response.json()
+                    _LOGGER.debug(f"Données API settings récupérées : {api_data}")  # noqa: G004
+
+                    if "values" not in api_data.get("values"):
+                        _LOGGER.error(
+                            "Aucune donnée 'values' trouvée dans la réponse de l'API"
+                        )
+                        return self.data
+
+                    self.data["settings"] = api_data.get("values")["values"]
+
+        except aiohttp.ClientError as e:
+            _LOGGER.error(f"Erreur lors de la communication avec l'API : {e}")  # noqa: G004
+        except Exception as e:  # noqa: BLE001
+            _LOGGER.error(f"Erreur lors de la conversion de la réponse JSON : {e}")  # noqa: G004
+
         return self.data
 
     async def _async_login(self):
@@ -130,7 +156,7 @@ class VivrecoDataUpdateCoordinator(DataUpdateCoordinator):
                     login_data = await response.json()
                     self.api_token = login_data.get("token")
                     if not self.api_token:
-                        _LOGGER.error("Aucun token API trouvé dans la réponse.")
+                        _LOGGER.error("Aucun token API trouvé dans la réponse")
                         raise ConfigEntryNotReady("Aucun token API trouvé.")  # noqa: TRY301
                     _LOGGER.debug(f"Token API récupéré : {self.api_token}")  # noqa: G004
         except aiohttp.ClientError as e:
@@ -159,7 +185,7 @@ class VivrecoDataUpdateCoordinator(DataUpdateCoordinator):
                     hp_ids = user_data.get("hp_id", [])
                     if not hp_ids:
                         _LOGGER.error(
-                            "Aucun identifiant de PAC trouvé dans la réponse utilisateur."
+                            "Aucun identifiant de PAC trouvé dans la réponse utilisateur"
                         )
                         raise ConfigEntryNotReady("Aucun identifiant de PAC trouvé.")  # noqa: TRY301
 

@@ -1,5 +1,5 @@
 {
-    "domain": "hass-vivreco-pac",
+    "domain": "hass_vivreco_pac",
     "name": "Vivreco PAC",
     "codeowners": ["@fab5741"],
     "config_flow": true,
@@ -8,5 +8,5 @@
     "iot_class": "cloud_polling",
     "issue_tracker": "https://github.com/fab5741/hass-vivreco-pac/issues",
     "requirements": ["aiohttp"],
-    "version": "1.2"
+    "version": "1.3"
 }
