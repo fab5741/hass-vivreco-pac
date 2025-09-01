@@ -1,4 +1,4 @@
-# Integration Vivreco Pompe à chaleur pour Home Assistant
+# Intégration Vivreco Pompe à chaleur pour Home Assistant
 
 [![GitHub release](https://img.shields.io/github/v/release/fab5741/hass-vivreco-pac.svg?include_prereleases=&sort=semver&color=blue)](https://github.com/fab5741/hass-vivreco-pac/releases/)
 [![GH-code-size](https://img.shields.io/github/languages/code-size/fab5741/hass-vivreco-pac?color=red)](https://github.com/fab5741/hass-vivreco-pac)
