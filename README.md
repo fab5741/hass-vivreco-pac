@@ -23,7 +23,7 @@ Intégration non officielle pour [Home Assistant][home-assistant] permettant de 
 
 ## Installation
 
-### Manuelle
+### Manuellee
 
 1. Clonez ce dépôt dans le dossier `custom_components` de votre installation Home Assistant.
    ```bash
