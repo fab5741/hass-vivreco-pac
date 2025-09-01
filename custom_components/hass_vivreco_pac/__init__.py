@@ -7,6 +7,7 @@ from homeassistant.const import CONF_EMAIL, CONF_PASSWORD, CONF_SCAN_INTERVAL
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import config_validation as cv
 
+from .api import VivrecoApiClient
 from .const import DEFAULT_UPDATE_INTERVAL, DOMAIN, PLATFORMS
 from .coordinator import VivrecoDataUpdateCoordinator
 
@@ -23,11 +24,16 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     """Set up Vivreco PAC from a config entry."""
     hass.data.setdefault(DOMAIN, {})
 
+    # Initialise l'API
+    api = VivrecoApiClient(
+        username=entry.data[CONF_EMAIL],
+        password=entry.data[CONF_PASSWORD],
+    )
+
     # Création du coordinateur
     coordinator = VivrecoDataUpdateCoordinator(
         hass,
-        username=entry.data.get(CONF_EMAIL),
-        password=entry.data.get(CONF_PASSWORD),
+        api,
         update_interval=entry.data.get(CONF_SCAN_INTERVAL, DEFAULT_UPDATE_INTERVAL),
     )
     await coordinator.async_config_entry_first_refresh()
