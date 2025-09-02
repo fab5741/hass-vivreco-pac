@@ -30,10 +30,11 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         password=entry.data[CONF_PASSWORD],
     )
 
+    hass.data[DOMAIN]["api"] = api
+
     # Création du coordinateur
     coordinator = VivrecoDataUpdateCoordinator(
         hass,
-        api,
         update_interval=entry.data.get(CONF_SCAN_INTERVAL, DEFAULT_UPDATE_INTERVAL),
     )
     await coordinator.async_config_entry_first_refresh()
