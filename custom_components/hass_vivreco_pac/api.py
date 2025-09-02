@@ -11,6 +11,7 @@ from .const import (
     API_CHART_URL_TEMPLATE,
     API_ENERGY_URL_TEMPLATE,
     API_LOGIN_URL,
+    API_SETTINGS_COMMAND,
     API_SETTINGS_URL_TEMPLATE,
     API_USER_URL,
 )
@@ -27,6 +28,7 @@ class VivrecoApiClient:
         self.password = password
         self.api_token: str | None = None
         self.hp_id: str | None = None
+        self.version: str | None = None
 
     async def login(self) -> None:
         """Connexion et récupération du token API."""
@@ -83,8 +85,26 @@ class VivrecoApiClient:
         url = API_SETTINGS_URL_TEMPLATE.format(hp_id=self.hp_id)
         api_data = await self._get_json(url)
 
+        if api_data and "values" in api_data:
+            values_section = api_data["values"]
+            self.version = values_section.get("version")
+            _LOGGER.debug("Version des settings récupérée : %s", self.version)
+
         _LOGGER.debug(f"Données API settings récupérées: {api_data}.")  # noqa: G004
         return api_data
+
+    async def send_command(self, group: str, values: dict) -> dict:
+        """Envoie une commande à la PAC."""
+        url = API_SETTINGS_COMMAND.format(hp_id=self.hp_id)
+        headers = self._headers
+        payload = {"group": group, "values": values, "version": self.version}
+
+        async with aiohttp.ClientSession() as session:  # noqa: SIM117
+            async with session.post(url, headers=headers, json=payload) as response:
+                if response.status != 201:
+                    _LOGGER.error("Erreur envoi commande %s : %s", url, response.status)
+                    return {}
+                return await response.json()
 
     async def _get_json(self, url: str) -> dict:
         """Envoie une requête GET et retourne la réponse JSON."""
