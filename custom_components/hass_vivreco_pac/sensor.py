@@ -15,7 +15,7 @@ _LOGGER = logging.getLogger(__name__)
 async def async_setup_entry(
     hass: HomeAssistant, entry: ConfigEntry, async_add_entities
 ):
-    """Initialisation de la plateforme des capteurs."""  # noqa: D401
+    """Initialisation de la plateforme des capteurs."""
 
     coordinator = hass.data[DOMAIN][entry.entry_id]
 
@@ -58,7 +58,7 @@ class VivrecoSensor(VivrecoBaseEntity, SensorEntity):
     """Représentation d'un capteur Vivreco."""
 
     def __init__(self, coordinator, sensor_key, device_class=None) -> None:
-        """Initialisation du capteur."""  # noqa: D401
+        """Initialisation du capteur."""
 
         super().__init__(coordinator)
         self.coordinator = coordinator
@@ -97,7 +97,7 @@ class VivrecoStateSensor(VivrecoBaseEntity, SensorEntity):
     """Représentation du capteur d'état de la pompe à chaleur."""
 
     def __init__(self, coordinator, sensor_key) -> None:
-        """Initialisation du capteur d'état."""  # noqa: D401
+        """Initialisation du capteur d'état."""
 
         super().__init__(coordinator)
         self.coordinator = coordinator
@@ -125,7 +125,7 @@ class VivrecoConsumptionSensor(VivrecoSensor):
     """Représentation d'un capteur de consommation quotidienne Vivreco."""
 
     def __init__(self, coordinator, sensor_key, energy_type, device_class=None) -> None:
-        """Initialisation du capteur avec un nom et un type d'énergie spécifique."""  # noqa: D401
+        """Initialisation du capteur avec un nom et un type d'énergie spécifique."""
 
         # Appel du constructeur parent
         super().__init__(coordinator, sensor_key, device_class)
