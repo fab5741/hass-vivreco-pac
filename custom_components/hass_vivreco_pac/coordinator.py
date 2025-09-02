@@ -6,7 +6,7 @@ import logging
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 
-from .api import VivrecoApiClient
+from .const import DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -14,9 +14,7 @@ _LOGGER = logging.getLogger(__name__)
 class VivrecoDataUpdateCoordinator(DataUpdateCoordinator):
     """Gère la récupération et la mise à jour des données depuis l'API."""
 
-    def __init__(
-        self, hass: HomeAssistant, api: VivrecoApiClient, update_interval
-    ) -> None:
+    def __init__(self, hass: HomeAssistant, update_interval) -> None:
         """Initialise le coordinateur."""
         super().__init__(
             hass,
@@ -25,14 +23,17 @@ class VivrecoDataUpdateCoordinator(DataUpdateCoordinator):
             update_interval=timedelta(minutes=update_interval),
         )
 
-        self.api = api
-
         self.data = {
             "values": {},
             "labels": {},
             "energy": {},
             "settings": {},
         }
+
+    @property
+    def api(self):
+        """API Vivreco."""
+        return self.hass.data[DOMAIN]["api"]
 
     async def _async_update_data(self):
         """Récupère les données depuis l'API."""
