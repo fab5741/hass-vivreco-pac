@@ -13,9 +13,22 @@ Intégration non officielle pour [Home Assistant][home-assistant] permettant de 
 Cette intégration récupère les données de fonctionnement et de température via l’API officielle de [Vivreco][vivreco].
 
 ## Fonctionnalités
-- Suivi en temps réel de votre pompe à chaleur.  
-- Capteurs pour la température, l’état du compresseur et d’autres valeurs clés.  
+- Suivi en temps réel de votre pompe à chaleur.
+- Capteurs:
+  - Consigne de température.
+  - Température mesurée.
+  - État du compresseur.
+  - Mode de fonctionnement.
+  - Consomation énergétique.
+- Contrôle de votre pompe à chaleur :
+  - Paramétrage des consignes de température
+  - Sélection du type d'ambiance pour la zone principale (confort, normal, réduit, hors-gel)
+  - Activer/Désactiver les modes chauffages, rafraîchissement, ECS.
 - Configuration simple avec intervalle de mise à jour personnalisable.
+- Fourniture d'une intégration type "climate" utilisable avec des cards type :
+  - Simple Thermostat
+  - Mushroom Climate
+  - Thermostat
 
 ## Installation
 
