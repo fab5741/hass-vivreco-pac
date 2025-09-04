@@ -13,6 +13,52 @@
         }
     },
     "entity": {
+        "climate": {
+            "climatisation": {
+                "name": "Air Conditioning",
+                "preset_mode": {
+                    "hg": "Frost Protection",
+                    "reduit": "Reduced",
+                    "confort": "Comfort",
+                    "normal": "Normal"
+                }
+            }
+        },
+        "number": {
+            "ecs_consigne_hg": { "name": "DHW Consigne Hors-gel" },
+            "ecs_consigne_normal": { "name": "DHW Consigne Normal" },
+            "ecs_consigne_reduit": { "name": "DHW Consigne Réduit" },
+            "chauffage_consigne_confort": { "name": "Heating Comfort Setpoint" },
+            "chauffage_consigne_hg": { "name": "Heating Frost Protection Setpoint" },
+            "chauffage_consigne_normal": { "name": "Heating Normal Setpoint" },
+            "chauffage_consigne_reduit": { "name": "Heating Reduced Setpoint" }
+        },
+        "select": {
+            "mode_zone_principale": {
+                "name": "Main zone mode",
+                "state": {
+                    "hg": "Frost protection",
+                    "reduit": "Reduced",
+                    "normal": "Normal",
+                    "confort": "Comfort",
+                    "auto": "Automatic"
+                }
+            }
+        },
+        "switch": {
+            "mode_ecs": {
+                "name": "DHW Mode"
+            },
+            "mode_ch": {
+                "name": "Heating Mode"
+            },
+            "mode_raf": {
+                "name": "Cooling Mode"
+            },
+            "mode_appoint_elec": {
+                "name": "Electric Backup Mode"
+            }
+        },
         "binary_sensor": {
             "mode_ecs": {
                 "name": "DHW Mode",
