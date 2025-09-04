@@ -15,13 +15,7 @@
     "entity": {
         "climate": {
             "climatisation": {
-                "name": "Air Conditioning",
-                "preset_mode": {
-                    "hg": "Frost Protection",
-                    "reduit": "Reduced",
-                    "confort": "Comfort",
-                    "normal": "Normal"
-                }
+                "name": "Air Conditioning"
             }
         },
         "number": {

@@ -15,13 +15,7 @@
     "entity": {
         "climate": {
             "climatisation": {
-                "name": "Climatisation",
-                "preset_mode": {
-                    "hg": "Hors-gel",
-                    "reduit": "Réduit",
-                    "confort": "Confort",
-                    "normal": "Normal"
-                }
+                "name": "Climatisation"
             }
         },
         "number": {
