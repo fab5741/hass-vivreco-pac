@@ -13,6 +13,46 @@
         }
     },
     "entity": {
+        "climate": {
+            "climatisation": {
+                "name": "Climatisation"
+            }
+        },
+        "number": {
+            "ecs_consigne_hg": { "name": "ECS Consigne Hors-gel" },
+            "ecs_consigne_normal": { "name": "ECS Consigne Normal" },
+            "ecs_consigne_reduit": { "name": "ECS Consigne Réduit" },
+            "chauffage_consigne_confort": { "name": "Chauffage Consigne Confort" },
+            "chauffage_consigne_hg": { "name": "Chauffage Consigne Hors-gel" },
+            "chauffage_consigne_normal": { "name": "Chauffage Consigne Normal" },
+            "chauffage_consigne_reduit": { "name": "Chauffage Consigne Réduit" }
+        },
+        "select": {
+            "mode_zone_principale": {
+                "name": "Mode zone principale",
+                "state": {
+                    "hg": "Hors-gel",
+                    "reduit": "Réduit",
+                    "normal": "Normal",
+                    "confort": "Confort",
+                    "auto": "Automatique"
+                }
+            }
+        },
+        "switch": {
+            "mode_ecs": {
+                "name": "Mode ECS"
+            },
+            "mode_ch": {
+                "name": "Mode chauffage"
+            },
+            "mode_raf": {
+                "name": "Mode rafraîchissement"
+            },
+            "mode_appoint_elec": {
+                "name": "Mode appoint électrique"
+            }
+        },
         "binary_sensor": {
             "mode_ecs": {
                 "name": "Mode ECS",

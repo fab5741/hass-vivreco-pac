@@ -49,7 +49,7 @@ class VivrecoModeSensor(VivrecoBaseEntity, BinarySensorEntity):
     """Représentation d'un capteur binaire pour les modes de fonctionnement."""
 
     def __init__(self, coordinator, sensor_key, name) -> None:
-        """Initialisation du capteur binaire."""  # noqa: D401
+        """Initialisation du capteur binaire."""
 
         super().__init__(coordinator)
         self.coordinator = coordinator
@@ -79,7 +79,7 @@ class VivrecoCompSensor(VivrecoBaseEntity, BinarySensorEntity):
     """Représentation d'un capteur binaire pour le compresseur."""
 
     def __init__(self, coordinator, sensor_key) -> None:
-        """Initialisation du capteur binaire."""  # noqa: D401
+        """Initialisation du capteur binaire."""
 
         super().__init__(coordinator)
         self.coordinator = coordinator
