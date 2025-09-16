@@ -37,6 +37,15 @@
                     "confort": "Comfort",
                     "auto": "Automatic"
                 }
+            },
+            "mode_ecs": {
+                "name": "DHW Mode",
+                "state": {
+                    "hg": "Frost Protection",
+                    "reduit": "Reduced",
+                    "normal": "Normal",
+                    "auto": "Automatic"
+                }
             }
         },
         "switch": {
