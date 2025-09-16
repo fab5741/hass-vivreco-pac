@@ -37,6 +37,15 @@
                     "confort": "Confort",
                     "auto": "Automatique"
                 }
+            },
+            "mode_ecs": {
+                "name": "Mode ECS",
+                "state": {
+                    "hg": "Hors-gel",
+                    "reduit": "Réduit",
+                    "normal": "Normal",
+                    "auto": "Automatique"
+                }
             }
         },
         "switch": {
@@ -126,6 +135,20 @@
                     "raf": "Rafraîchissement",
                     "ecs": "ECS",
                     "arret": "Arrêt"
+                }
+            }
+        },
+        "water_heater": {
+            "ecs": {
+                "name": "ECS",
+                "state": {
+                    "off": "Arrêté",
+                    "on": "En marche"
+                },
+                "operation_mode": {
+                    "hg": "Hors-gel",
+                    "reduit": "Réduit",
+                    "normal": "Normal"
                 }
             }
         }

@@ -11,6 +11,7 @@ PLATFORMS: list[Platform] = [
     Platform.SELECT,
     Platform.SENSOR,
     Platform.SWITCH,
+    Platform.WATER_HEATER,
 ]
 
 # Constantes pour les URLs de l'API
@@ -43,6 +44,13 @@ MODE_AMBIANCE_ZONE_PRINCIPALE = [
     "hg",
     "reduit",
     "confort",
+    "auto",
+    "normal",
+]
+
+MODE_AMBIANCE_ECS = [
+    "hg",
+    "reduit",
     "auto",
     "normal",
 ]

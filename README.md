@@ -29,6 +29,7 @@ Cette intégration récupère les données de fonctionnement et de température 
   - Simple Thermostat
   - Mushroom Climate
   - Thermostat
+- Fourniture d'une intégration type "water_heater" pour le ballon d'eau chaude.
 
 ## Installation
 
@@ -57,6 +58,8 @@ Une fois l’intégration configurée, vous pourrez voir apparaître différents
 - Consignes de température
 - État de fonctionnement du compresseur
 - Mode de fonctionnement activé
+- Entité climate pour gérer le chauffage / rafraîchissement
+- Entité water_heater pour gérer le ballon d'eau chaude
 
 ## Remarques importantes
 
