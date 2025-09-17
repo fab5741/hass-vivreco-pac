@@ -20,11 +20,22 @@ async def async_setup_entry(
 ):
     """Set up Vivreco PAC switches based on config entry."""
     coordinator = hass.data[DOMAIN][entry.entry_id]
+    config = coordinator.data.get("config", {})
 
     switches = []
-
     for key, name in MODE.items():
-        switches.append(VivrecoSwitch(coordinator, key, name))
+        supported = False
+        if key == "auth_p/etat_glob/aut_app_elec":
+            supported = config.get("app_elec", False)
+        elif key == "auth_p/etat_glob/aut_ch":
+            supported = config.get("ch", False)
+        elif key == "auth_p/etat_glob/aut_ecs":
+            supported = config.get("ecs", False)
+        elif key == "auth_p/etat_glob/aut_raf":
+            supported = config.get("raf", False)
+
+        if supported:
+            switches.append(VivrecoSwitch(coordinator, key, name))
 
     async_add_entities(switches)
 

@@ -40,6 +40,24 @@ MODE_ICON_MAPPING = {
     "mode_raf": "mdi:snowflake",
 }
 
+SENSORS = {
+    "t_ecs": {
+        "requires": "ecs",
+    },
+    "t_ext": {
+        "requires": None,
+    },
+    "t_int": {
+        "requires": "ch",
+    },
+    "cons_t_ecs": {
+        "requires": "ecs",
+    },
+    "cons_t_int": {
+        "requires": "ch",
+    },
+}
+
 MODE_AMBIANCE_ZONE_PRINCIPALE = [
     "hg",
     "reduit",
@@ -85,3 +103,10 @@ CHAUFFAGE_SETPOINTS = {
 
 # Intervalle de récupération des données (en minutes)
 DEFAULT_UPDATE_INTERVAL = 5
+
+MODE_EMOJI = {
+    "app_elec": "🔌",
+    "ch": "🔥",
+    "ecs": "🚿",
+    "raf": "❄️",
+}

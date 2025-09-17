@@ -7,7 +7,13 @@ from homeassistant.components.water_heater import (
     WaterHeaterEntityFeature,
 )
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import ATTR_TEMPERATURE, UnitOfTemperature
+from homeassistant.const import (
+    ATTR_TEMPERATURE,
+    STATE_IDLE,
+    STATE_OFF,
+    STATE_ON,
+    UnitOfTemperature,
+)
 from homeassistant.core import HomeAssistant
 
 from .const import DOMAIN, ECS_SETPOINTS, MODE_AMBIANCE_ECS
@@ -21,6 +27,13 @@ async def async_setup_entry(
 ):
     """Set up the Vivreco PAC water heater entity."""
     coordinator = hass.data[DOMAIN][entry.entry_id]
+    config = coordinator.data.get("config", {})
+
+    # Si la PAC ne supporte pas ECS, ne pas créer l'entité
+    if not config.get("ecs", False):
+        _LOGGER.info("ECS non supporté, l'entité Water Heater ne sera pas ajoutée")
+        return
+
     async_add_entities([VivrecoWaterHeater(coordinator)])
 
 
@@ -63,10 +76,14 @@ class VivrecoWaterHeater(VivrecoBaseEntity, WaterHeaterEntity):
 
     @property
     def current_operation(self) -> str:
-        """Retourne le mode ECS actuel (hg, reduit, normal, auto)."""
-        return self.coordinator.data.get("settings", {}).get(
-            "mode_ecs/ambiance_ecs", "normal"
-        )
+        """Retourne l’état de fonctionnement du ballon ECS."""
+        state = self.coordinator.data.get("values", {}).get("state")
+
+        if not self.is_on:
+            return STATE_OFF
+        if state == "ecs":
+            return STATE_ON  # chauffe en cours
+        return STATE_IDLE  # ECS activée mais pas en chauffe
 
     @property
     def target_temperature(self):

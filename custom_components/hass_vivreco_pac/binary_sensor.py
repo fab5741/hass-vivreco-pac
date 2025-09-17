@@ -17,6 +17,7 @@ async def async_setup_entry(
 ):
     """Set up binary sensors for Vivreco PAC."""
     coordinator = hass.data[DOMAIN][entry.entry_id]
+    config = coordinator.data.get("config", {})
 
     if not coordinator.data or "settings" not in coordinator.data:
         _LOGGER.error(
@@ -37,10 +38,23 @@ async def async_setup_entry(
 
     # Ajouter les modes
     if "settings" in coordinator.data:
-        entities.extend(
-            VivrecoModeSensor(coordinator, sensor_key, entity_name)
-            for sensor_key, entity_name in MODE.items()
-        )
+        for sensor_key, entity_name in MODE.items():
+            if sensor_key == "auth_p/etat_glob/aut_app_elec" and not config.get(
+                "app_elec", False
+            ):
+                continue
+            if sensor_key == "auth_p/etat_glob/aut_ch" and not config.get("ch", False):
+                continue
+            if sensor_key == "auth_p/etat_glob/aut_ecs" and not config.get(
+                "ecs", False
+            ):
+                continue
+            if sensor_key == "auth_p/etat_glob/aut_raf" and not config.get(
+                "raf", False
+            ):
+                continue
+
+            entities.append(VivrecoModeSensor(coordinator, sensor_key, entity_name))
 
     async_add_entities(entities)
 

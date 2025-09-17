@@ -22,18 +22,21 @@ async def async_setup_entry(
 ):
     """Set up Vivreco PAC number entities based on config entry."""
     coordinator = hass.data[DOMAIN][entry.entry_id]
+    config = coordinator.data.get("config", {})
 
     numbers = []
 
-    numbers.extend(
-        VivrecoEcsConsignesNumber(coordinator, mode, info)
-        for mode, info in ECS_SETPOINTS.items()
-    )
+    if config.get("ecs", False):
+        numbers.extend(
+            VivrecoEcsConsignesNumber(coordinator, mode, info)
+            for mode, info in ECS_SETPOINTS.items()
+        )
 
-    numbers.extend(
-        VivrecoChauffageConsignesNumber(coordinator, mode, info)
-        for mode, info in CHAUFFAGE_SETPOINTS.items()
-    )
+    if config.get("ch", False) or config.get("raf", False):
+        numbers.extend(
+            VivrecoChauffageConsignesNumber(coordinator, mode, info)
+            for mode, info in CHAUFFAGE_SETPOINTS.items()
+        )
 
     async_add_entities(numbers)
 

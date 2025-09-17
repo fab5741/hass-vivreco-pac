@@ -2,11 +2,16 @@
 
 import logging
 
-from homeassistant.components.sensor import SensorDeviceClass, SensorEntity
+from homeassistant.components.sensor import (
+    SensorDeviceClass,
+    SensorEntity,
+    SensorStateClass,
+)
 from homeassistant.config_entries import ConfigEntry
+from homeassistant.const import UnitOfEnergy, UnitOfTemperature
 from homeassistant.core import HomeAssistant
 
-from .const import DOMAIN
+from .const import DOMAIN, SENSORS
 from .entity import VivrecoBaseEntity
 
 _LOGGER = logging.getLogger(__name__)
@@ -16,8 +21,8 @@ async def async_setup_entry(
     hass: HomeAssistant, entry: ConfigEntry, async_add_entities
 ):
     """Initialisation de la plateforme des capteurs."""
-
     coordinator = hass.data[DOMAIN][entry.entry_id]
+    config = coordinator.data.get("config", {})
 
     # Vérifiez si des données sont disponibles avant de configurer les capteurs
     if not coordinator.data or "values" not in coordinator.data:
@@ -28,27 +33,46 @@ async def async_setup_entry(
     sensors = []
     for sensor_key in coordinator.data["values"]:
         if sensor_key == "state":
-            sensors.append(VivrecoStateSensor(coordinator, sensor_key))
-        elif sensor_key in ["t_ecs", "cons_t_int", "t_int", "cons_t_ecs", "t_ext"]:
-            sensors.append(
-                VivrecoTemperatureSensor(
-                    coordinator, sensor_key, SensorDeviceClass.TEMPERATURE
-                )
-            )
+            sensors.append(VivrecoStateSensor(coordinator, sensor_key))  # noqa: PERF401
 
-    sensors.append(
-        VivrecoConsumptionSensor(coordinator, "ch_wh", "ch", SensorDeviceClass.ENERGY)
-    )
-    sensors.append(
-        VivrecoConsumptionSensor(coordinator, "ecs_wh", "ecs", SensorDeviceClass.ENERGY)
-    )
+    for key, meta in SENSORS.items():
+        required = meta.get("requires")
+        if (
+            required == "ch"
+            and not (config.get("ch", False) or config.get("raf", False))
+        ) or (required not in (None, "ch") and not config.get(required, False)):
+            _LOGGER.debug("Sensor %s ignoré (feature %s non supportée)", key, required)
+            continue
+
+        sensors.append(
+            VivrecoTemperatureSensor(coordinator, key, SensorDeviceClass.TEMPERATURE)
+        )
+
+    if config.get("ch", True):
+        sensors.append(
+            VivrecoConsumptionSensor(
+                coordinator, "ch_wh", "ch", SensorDeviceClass.ENERGY
+            )
+        )
+
+    if config.get("ecs", True):
+        sensors.append(
+            VivrecoConsumptionSensor(
+                coordinator, "ecs_wh", "ecs", SensorDeviceClass.ENERGY
+            )
+        )
+
+    if config.get("raf", True):
+        sensors.append(
+            VivrecoConsumptionSensor(
+                coordinator, "raf_wh", "raf", SensorDeviceClass.ENERGY
+            )
+        )
+
     sensors.append(
         VivrecoConsumptionSensor(
             coordinator, "other_wh", "other", SensorDeviceClass.ENERGY
         )
-    )
-    sensors.append(
-        VivrecoConsumptionSensor(coordinator, "raf_wh", "raf", SensorDeviceClass.ENERGY)
     )
 
     async_add_entities(sensors)
@@ -69,8 +93,8 @@ class VivrecoSensor(VivrecoBaseEntity, SensorEntity):
         self._attr_unique_id = f"vivreco_{sensor_key}"
 
     @property
-    def state(self):
-        """Retourne la valeur actuelle du capteur."""
+    def native_value(self):
+        """Valeur native."""
         return self.coordinator.data["values"].get(self._sensor_key)
 
     @property
@@ -88,9 +112,14 @@ class VivrecoTemperatureSensor(VivrecoSensor):
     """Représentation d'un capteur de température Vivreco."""
 
     @property
-    def unit_of_measurement(self):
+    def native_unit_of_measurement(self):
         """Retourne l'unité de mesure (°C pour les températures)."""
-        return "°C"
+        return UnitOfTemperature.CELSIUS
+
+    @property
+    def state_class(self):
+        """TYpe mesure."""
+        return SensorStateClass.MEASUREMENT
 
 
 class VivrecoStateSensor(VivrecoBaseEntity, SensorEntity):
@@ -132,13 +161,14 @@ class VivrecoConsumptionSensor(VivrecoSensor):
         self.energy_type = energy_type  # Stocke le type d'énergie
 
     @property
-    def unit_of_measurement(self):
+    def native_unit_of_measurement(self):
         """Retourne l'unité de mesure (kWh pour la consommation)."""
-        return "kWh"
+        return UnitOfEnergy.KILO_WATT_HOUR
 
     @property
-    def state_class(self):  # noqa: D102
-        return "total_increasing"  # Indique que c'est un compteur cumulatif
+    def state_class(self):
+        """Type compteur cumulatif."""
+        return SensorStateClass.TOTAL_INCREASING
 
     def get_consumption(self):
         """Retourne la consommation pour un type d'énergie donné (ch, ecs, raf, other)."""
