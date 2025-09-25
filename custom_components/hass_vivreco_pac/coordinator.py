@@ -28,6 +28,7 @@ class VivrecoDataUpdateCoordinator(DataUpdateCoordinator):
             "labels": {},
             "energy": {},
             "settings": {},
+            "config": {},
         }
 
     @property
@@ -63,6 +64,15 @@ class VivrecoDataUpdateCoordinator(DataUpdateCoordinator):
             )
 
         if settings_data and "values" in settings_data:
-            self.data["settings"] = settings_data["values"]["values"]
+            settings = settings_data["values"]["values"]
+            self.data["settings"] = settings
+
+            # Détection des fonctionnalités disponibles
+            self.data["config"] = {
+                "app_elec": "auth_p/etat_glob/aut_app_elec" in settings,
+                "ch": "auth_p/etat_glob/aut_ch" in settings,
+                "ecs": "auth_p/etat_glob/aut_ecs" in settings,
+                "raf": "auth_p/etat_glob/aut_raf" in settings,
+            }
 
         return self.data

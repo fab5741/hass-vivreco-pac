@@ -21,11 +21,18 @@ async def async_setup_entry(
 ):
     """Set up Vivreco PAC select entities based on config entry."""
     coordinator = hass.data[DOMAIN][entry.entry_id]
+    config = coordinator.data.get("config", {})
 
-    selects = [
-        VivrecoModeZoneSelect(coordinator),
-        VivrecoModeEcsSelect(coordinator),
-    ]
+    selects = []
+
+    # Mode zone principale : seulement si chauffage ou rafraîchissement supporté
+    if config.get("ch", False) or config.get("raf", False):
+        selects.append(VivrecoModeZoneSelect(coordinator))
+
+    # Mode ECS : seulement si ECS supporté
+    if config.get("ecs", False):
+        selects.append(VivrecoModeEcsSelect(coordinator))
+
     async_add_entities(selects)
 
 

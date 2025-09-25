@@ -22,6 +22,15 @@ async def async_setup_entry(
 ):
     """Configurer l’entité Climate Vivreco PAC."""
     coordinator = hass.data[DOMAIN][entry.entry_id]
+    config = coordinator.data.get("config", {})
+
+    # Si la PAC ne supporte pas CH ou RAF, ne pas créer l'entité
+    if not config.get("ch", False) and not config.get("raf", False):
+        _LOGGER.info(
+            "Climate/Chauffage non supporté, l'entité Climate ne sera pas ajoutée"
+        )
+        return
+
     async_add_entities([VivrecoClimate(coordinator)])
 
 
@@ -45,6 +54,7 @@ class VivrecoClimate(VivrecoBaseEntity, ClimateEntity):
         """Initialisation du Climate."""
         super().__init__(coordinator)
         self.coordinator = coordinator
+        self.config = coordinator.data.get("config", {})
 
     # ---------- Températures ----------
 
@@ -81,16 +91,21 @@ class VivrecoClimate(VivrecoBaseEntity, ClimateEntity):
         """Retourne le mode HVAC actuel (chauffage / rafraîchissement / off)."""
         settings = self.coordinator.data.get("settings", {})
 
-        if settings.get("auth_p/etat_glob/aut_ch"):
+        if settings.get("auth_p/etat_glob/aut_ch") and self.config.get("ch", False):
             return HVACMode.HEAT
-        if settings.get("auth_p/etat_glob/aut_raf"):
+        if settings.get("auth_p/etat_glob/aut_raf") and self.config.get("raf", False):
             return HVACMode.COOL
         return HVACMode.OFF
 
     @property
     def hvac_modes(self) -> list[HVACMode]:
-        """Liste des modes HVAC disponibles."""
-        return [HVACMode.OFF, HVACMode.HEAT, HVACMode.COOL]
+        """Liste des modes HVAC disponibles selon les capacités de la PAC."""
+        modes = [HVACMode.OFF]
+        if self.config.get("ch", False):
+            modes.append(HVACMode.HEAT)
+        if self.config.get("raf", False):
+            modes.append(HVACMode.COOL)
+        return modes
 
     # ---------- Presets ----------
 
