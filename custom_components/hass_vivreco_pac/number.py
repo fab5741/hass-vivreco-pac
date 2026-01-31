@@ -60,7 +60,6 @@ class VivrecoEcsConsignesNumber(VivrecoBaseEntity, NumberEntity):
         self.native_unit_of_measurement = UnitOfTemperature.CELSIUS
         self._attr_entity_category = EntityCategory.CONFIG
         self.device_class = NumberDeviceClass.TEMPERATURE
-        self._attr_has_entity_name = True
 
     @property
     def native_value(self):
