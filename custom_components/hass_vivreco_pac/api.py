@@ -39,16 +39,18 @@ class VivrecoApiClient:
         try:
             async with self.session.post(API_LOGIN_URL, headers=headers) as response:
                 if response.status != 200:
-                    raise ConfigEntryNotReady(  # noqa: TRY301
+                    raise ConfigEntryNotReady(
                         f"Erreur connexion API: {response.status}"
                     )
                 login_data = await response.json()
                 self.api_token = login_data.get("token")
                 if not self.api_token:
-                    raise ConfigEntryNotReady("Aucun token API trouvé.")  # noqa: TRY301
+                    raise ConfigEntryNotReady("Aucun token API trouvé.")
                 _LOGGER.debug("Token API récupéré : %s", self.api_token)
-        except Exception as e:  # noqa: BLE001
-            raise ConfigEntryNotReady(f"Erreur connexion API: {e}")  # noqa: B904
+        except aiohttp.ClientError as e:
+            raise ConfigEntryNotReady(f"Erreur de connexion API: {e}") from e
+        except ConfigEntryNotReady:
+            raise
 
     async def fetch_hp_id(self) -> None:
         """Récupère l'identifiant de la PAC."""
@@ -100,20 +102,36 @@ class VivrecoApiClient:
         headers = self._headers
         payload = {"group": group, "values": values, "version": self.version}
 
-        async with self.session.post(url, headers=headers, json=payload) as response:
-            if response.status != 201:
-                _LOGGER.error("Erreur envoi commande %s : %s", url, response.status)
-                return {}
-            return await response.json()
+        try:
+            async with self.session.post(url, headers=headers, json=payload) as response:
+                if response.status == 401:
+                    _LOGGER.warning("Token expiré lors de l'envoi de commande")
+                    self.api_token = None
+                    return {}
+                if response.status != 201:
+                    _LOGGER.error("Erreur envoi commande %s : %s", url, response.status)
+                    return {}
+                return await response.json()
+        except aiohttp.ClientError as e:
+            _LOGGER.error("Erreur réseau lors de l'envoi de commande %s : %s", url, e)
+            return {}
 
     async def _get_json(self, url: str) -> dict:
         """Envoie une requête GET et retourne la réponse JSON."""
         headers = self._headers
-        async with self.session.get(url, headers=headers) as response:
-            if response.status != 200:
-                _LOGGER.error("Erreur API GET %s : %s", url, response.status)
-                return {}
-            return await response.json()
+        try:
+            async with self.session.get(url, headers=headers) as response:
+                if response.status == 401:
+                    _LOGGER.warning("Token expiré, reconnexion nécessaire")
+                    self.api_token = None
+                    return {}
+                if response.status != 200:
+                    _LOGGER.error("Erreur API GET %s : %s", url, response.status)
+                    return {}
+                return await response.json()
+        except aiohttp.ClientError as e:
+            _LOGGER.error("Erreur réseau lors de GET %s : %s", url, e)
+            return {}
 
     def _generate_basic_auth_header(self) -> str:
         """Génère l'en-tête Basic Auth pour la connexion."""
