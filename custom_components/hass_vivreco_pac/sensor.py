@@ -48,27 +48,28 @@ async def async_setup_entry(
             VivrecoTemperatureSensor(coordinator, key, SensorDeviceClass.TEMPERATURE)
         )
 
-    if config.get("ch", True):
+    if config.get("ch", False):
         sensors.append(
             VivrecoConsumptionSensor(
                 coordinator, "ch_wh", "ch", SensorDeviceClass.ENERGY
             )
         )
 
-    if config.get("ecs", True):
+    if config.get("ecs", False):
         sensors.append(
             VivrecoConsumptionSensor(
                 coordinator, "ecs_wh", "ecs", SensorDeviceClass.ENERGY
             )
         )
 
-    if config.get("raf", True):
+    if config.get("raf", False):
         sensors.append(
             VivrecoConsumptionSensor(
                 coordinator, "raf_wh", "raf", SensorDeviceClass.ENERGY
             )
         )
 
+    # Le capteur "other" est toujours créé
     sensors.append(
         VivrecoConsumptionSensor(
             coordinator, "other_wh", "other", SensorDeviceClass.ENERGY
@@ -174,12 +175,17 @@ class VivrecoConsumptionSensor(VivrecoSensor):
         """Retourne la consommation pour un type d'énergie donné (ch, ecs, raf, other)."""
         ch_consumption = None
 
-        for item in self.coordinator.data["energy"]:
-            if item["name"] == self.energy_type:
-                ch_consumption = item["y"]
+        # Vérifier que energy existe et est bien un tableau
+        energy_data = self.coordinator.data.get("energy")
+        if not energy_data or not isinstance(energy_data, list):
+            return None
+
+        for item in energy_data:
+            if item.get("name") == self.energy_type:
+                ch_consumption = item.get("y")
                 break
 
-        return ch_consumption if ch_consumption is not None else "N/A"
+        return ch_consumption
 
     @property
     def state(self):

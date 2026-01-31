@@ -60,7 +60,7 @@ class VivrecoDataUpdateCoordinator(DataUpdateCoordinator):
                 energy_data.get("values", {})
                 .get("values", {})
                 .get("energyValues", {})
-                .get("total", {})
+                .get("total", [])
             )
 
         if settings_data and "values" in settings_data:
