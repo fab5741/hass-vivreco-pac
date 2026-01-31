@@ -49,13 +49,13 @@ class VivrecoModeZoneSelect(VivrecoBaseEntity, SelectEntity):
         self._attr_translation_key = "mode_zone_principale"
         self._attr_entity_category = EntityCategory.CONFIG
 
-    def _get_current_value(self):
+    def _get_current_value(self) -> str:
         value = self.coordinator.data.get("settings", {}).get("mode_zone_p/ambiance")
         # Si None, on retourne "automatique" par défaut
         return value if value is not None else "normal"
 
     @property
-    def current_option(self):
+    def current_option(self) -> str:
         """Valeur actuelle."""
         return self._get_current_value()
 
@@ -66,11 +66,11 @@ class VivrecoModeZoneSelect(VivrecoBaseEntity, SelectEntity):
         return not settings.get("auth_p/etat_glob/aut_raf", False)
 
     @property
-    def options(self):
+    def options(self) -> list[str]:
         """Liste des options possibles."""
         return list(self._attr_options)
 
-    async def async_select_option(self, option: str):
+    async def async_select_option(self, option: str) -> None:
         """Change le mode_zone_p/ambiance via l'API."""
         if option not in self._attr_options:
             _LOGGER.warning("Option invalide: %s", option)
@@ -94,21 +94,21 @@ class VivrecoModeEcsSelect(VivrecoBaseEntity, SelectEntity):
         self._attr_translation_key = "mode_ecs"
         self._attr_entity_category = EntityCategory.CONFIG
 
-    def _get_current_value(self):
+    def _get_current_value(self) -> str:
         value = self.coordinator.data.get("settings", {}).get("mode_ecs/ambiance_ecs")
         return value if value is not None else "normal"
 
     @property
-    def current_option(self):
+    def current_option(self) -> str:
         """Valeur actuelle ECS."""
         return self._get_current_value()
 
     @property
-    def options(self):
+    def options(self) -> list[str]:
         """Liste des options possibles ECS."""
         return list(self._attr_options)
 
-    async def async_select_option(self, option: str):
+    async def async_select_option(self, option: str) -> None:
         """Change le mode_ecs/ambiance_ecs via l'API."""
         if option not in self._attr_options:
             _LOGGER.warning("Option ECS invalide: %s", option)

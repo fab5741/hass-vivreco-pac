@@ -43,7 +43,7 @@ async def async_setup_entry(
 class VivrecoSwitch(VivrecoBaseEntity, SwitchEntity):
     """Représentation d’un switch Vivreco."""
 
-    def __init__(self, coordinator, key, name) -> None:
+    def __init__(self, coordinator, key: str, name: str) -> None:
         """Init du switch."""
         super().__init__(coordinator)
         self._key = key
@@ -53,11 +53,11 @@ class VivrecoSwitch(VivrecoBaseEntity, SwitchEntity):
         self._attr_icon = MODE_ICON_MAPPING.get(name)
 
     @property
-    def is_on(self):
+    def is_on(self) -> bool:
         """Retourne l'état actuel du switch depuis les données."""
         return bool(self.coordinator.data.get("settings", {}).get(self._key))
 
-    async def async_turn_on(self, **kwargs):
+    async def async_turn_on(self, **kwargs) -> None:
         """Allume le switch via l’API."""
         values = {self._key: True}
 
@@ -81,7 +81,7 @@ class VivrecoSwitch(VivrecoBaseEntity, SwitchEntity):
         )
         await self.coordinator.async_request_refresh()
 
-    async def async_turn_off(self, **kwargs):
+    async def async_turn_off(self, **kwargs) -> None:
         """Éteint le switch via l’API."""
         await self.coordinator.api.send_command(
             group="customer_settings", values={self._key: False}
