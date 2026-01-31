@@ -6,6 +6,7 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_EMAIL, CONF_PASSWORD, CONF_SCAN_INTERVAL
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import config_validation as cv
+from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
 from .api import VivrecoApiClient
 from .const import DEFAULT_UPDATE_INTERVAL, DOMAIN, PLATFORMS
@@ -24,10 +25,12 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     """Set up Vivreco PAC from a config entry."""
     hass.data.setdefault(DOMAIN, {})
 
-    # Initialise l'API
+    # Initialise l'API avec la session aiohttp de Home Assistant
+    session = async_get_clientsession(hass)
     api = VivrecoApiClient(
         username=entry.data[CONF_EMAIL],
         password=entry.data[CONF_PASSWORD],
+        session=session,
     )
 
     hass.data[DOMAIN]["api"] = api
