@@ -1,8 +1,7 @@
 """Tests pour le flux de configuration Vivreco."""
 
-from unittest.mock import AsyncMock, patch
-
 import pytest
+from unittest.mock import AsyncMock, MagicMock, patch
 
 from custom_components.hass_vivreco_pac.config_flow import (
     VivrecoConfigFlow,
@@ -132,13 +131,15 @@ async def test_options_flow_update_scan_interval(hass):
     flow = VivrecoOptionsFlow(mock_entry)
     flow.hass = hass
 
-    with patch.object(hass.config_entries, "async_update_entry") as mock_update:
-        result = await flow.async_step_init(
-            user_input={CONF_SCAN_INTERVAL: 10}
-        )
+    # Créer un mock pour config_entries
+    mock_update = AsyncMock()
+    hass.config_entries = MagicMock()
+    hass.config_entries.async_update_entry = mock_update
 
-        assert result["type"] == FlowResultType.CREATE_ENTRY
-        mock_update.assert_called_once()
+    result = await flow.async_step_init(user_input={CONF_SCAN_INTERVAL: 10})
+
+    assert result["type"] == FlowResultType.CREATE_ENTRY
+    mock_update.assert_called_once()
 
 
 @pytest.mark.asyncio

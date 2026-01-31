@@ -5,9 +5,64 @@ Toutes les modifications notables de ce projet seront documentées dans ce fichi
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/),
 et ce projet adhère au [Semantic Versioning](https://semver.org/lang/fr/).
 
-## [Non publié]
+## [2.0.0] - 2026-01-31
 
-### En préparation pour v2.0.0
+### 🎉 Release majeure - Refactor complet "AI-Ready"
+
+Cette version marque un refactor complet du plugin avec des standards professionnels,
+une documentation exhaustive, et des outils modernes pour le développement.
+
+### Ajouté
+
+**Fonctionnalités:**
+- Capteur COP (Coefficient de Performance) avec historique par période
+- 4 capteurs de durée de fonctionnement (chauffage, ECS, rafraîchissement, autre)
+- Validation des credentials lors de la configuration initiale
+- Options Flow pour modifier les paramètres après installation
+- Session aiohttp réutilisable (bonnes pratiques Home Assistant)
+
+**Tests & Qualité:**
+- 26 tests unitaires (API, Coordinateur, Config Flow)
+- GitHub Actions pour tests automatiques (Python 3.11 & 3.12)
+- GitHub Actions pour linting (Ruff, Black, isort)
+- Pre-commit hooks pour validation automatique du code
+- Configuration pytest centralisée dans pyproject.toml
+- Couverture de code avec Codecov
+
+**Documentation:**
+- CHANGELOG.md complet avec historique des versions
+- README.md enrichi avec badges, exemples Lovelace, guide développement
+- CONTRIBUTING.md avec guide complet pour contributeurs
+- CLAUDE.md pour développement assisté par IA
+- Templates GitHub (Bug Report, Feature Request, Pull Request)
+- Documentation de la structure du projet
+
+**Configuration:**
+- pyproject.toml pour Black, Ruff, isort, pytest
+- .pre-commit-config.yaml avec hooks de validation
+- requirements_test.txt avec dépendances de test
+
+### Changé
+- Amélioration majeure de la gestion d'erreurs (aiohttp.ClientError)
+- Détection automatique des tokens expirés (HTTP 401)
+- Logs optimisés (formatage %s au lieu de f-strings)
+- Type hints complets sur switch.py et select.py
+
+### Corrigé
+- Issue #8: Parsing des capteurs d'énergie (tableau au lieu de dictionnaire)
+- Bug ligne dupliquée dans VivrecoEcsConsignesNumber
+- Valeurs par défaut config.get() (False au lieu de True)
+
+### Infrastructure
+- CI/CD complet avec 3 workflows GitHub Actions
+- Standards de code appliqués (PEP 8, Black, Ruff)
+- Documentation complète pour contributeurs
+- Templates standardisés pour issues et PR
+
+**Migration depuis 1.x:**
+Aucune action requise. La migration est transparente.
+Tous les capteurs existants continueront de fonctionner.
+Les nouveaux capteurs (COP, durées) seront ajoutés automatiquement.
 
 ## [1.10] - 2026-01-31
 

@@ -19,8 +19,8 @@ Cette intégration récupère les données de fonctionnement et de température 
 
 ### Capteurs d'énergie et performance
 - ⚡ Consommation énergétique (chauffage, ECS, rafraîchissement, autre)
-- ⏱️ Durées de fonctionnement cumulées (nouveau en v1.8)
-- 📈 **COP (Coefficient de Performance)** avec historique (nouveau en v1.9)
+- ⏱️ Durées de fonctionnement cumulées
+- 📈 **COP (Coefficient de Performance)** avec historique
   - Mesure l'efficacité énergétique de votre PAC
   - Historique par jour, semaine, mois, année
 
@@ -49,7 +49,7 @@ Cette intégration récupère les données de fonctionnement et de température 
 
 ### Installation manuelle
 
-1. Téléchargez la dernière release
+1. Téléchargez la [dernière release](https://github.com/fab5741/hass-vivreco-pac/releases/latest)
 2. Copiez le dossier `custom_components/hass_vivreco_pac` dans votre dossier `custom_components/`
 3. Redémarrez Home Assistant
 
@@ -131,6 +131,13 @@ cards:
 ## 🔧 Développement
 
 Ce projet utilise des outils modernes pour garantir la qualité du code :
+
+### Qualité et tests ✅
+- **26 tests unitaires** avec pytest (API, Coordinateur, Config Flow)
+- **GitHub Actions** pour CI/CD (tests automatiques sur Python 3.11 & 3.12)
+- **Pre-commit hooks** pour validation automatique du code
+- **Linting** avec Ruff, Black, et isort
+- **Type hints** complets pour une meilleure maintenabilité
 
 ### Prérequis
 ```bash

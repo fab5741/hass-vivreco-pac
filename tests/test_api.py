@@ -1,9 +1,8 @@
 """Tests pour le client API Vivreco."""
 
-from unittest.mock import AsyncMock, patch
-
 import aiohttp
 import pytest
+from unittest.mock import AsyncMock, MagicMock, patch
 
 from custom_components.hass_vivreco_pac.api import VivrecoApiClient
 from homeassistant.exceptions import ConfigEntryNotReady
@@ -14,8 +13,8 @@ async def test_login_success(mock_aiohttp_session, mock_api_responses, mock_resp
     """Test de connexion réussie."""
     api = VivrecoApiClient("test@example.com", "password", mock_aiohttp_session)
 
-    response = await mock_response(200, mock_api_responses["login"])
-    mock_aiohttp_session.post = AsyncMock(return_value=response)
+    response = mock_response(200, mock_api_responses["login"])
+    mock_aiohttp_session.post = MagicMock(return_value=response)
 
     await api.login()
 
@@ -28,8 +27,8 @@ async def test_login_failure_invalid_credentials(mock_aiohttp_session, mock_resp
     """Test de connexion échouée avec identifiants invalides."""
     api = VivrecoApiClient("test@example.com", "wrong", mock_aiohttp_session)
 
-    response = await mock_response(401, {})
-    mock_aiohttp_session.post = AsyncMock(return_value=response)
+    response = mock_response(401, {})
+    mock_aiohttp_session.post = MagicMock(return_value=response)
 
     with pytest.raises(ConfigEntryNotReady):
         await api.login()
@@ -40,7 +39,7 @@ async def test_login_network_error(mock_aiohttp_session):
     """Test de connexion échouée avec erreur réseau."""
     api = VivrecoApiClient("test@example.com", "password", mock_aiohttp_session)
 
-    mock_aiohttp_session.post = AsyncMock(
+    mock_aiohttp_session.post = MagicMock(
         side_effect=aiohttp.ClientError("Network error")
     )
 
@@ -54,8 +53,8 @@ async def test_fetch_hp_id_success(mock_aiohttp_session, mock_api_responses, moc
     api = VivrecoApiClient("test@example.com", "password", mock_aiohttp_session)
     api.api_token = "test_token"
 
-    response = await mock_response(200, mock_api_responses["user"])
-    mock_aiohttp_session.get = AsyncMock(return_value=response)
+    response = mock_response(200, mock_api_responses["user"])
+    mock_aiohttp_session.get = MagicMock(return_value=response)
 
     await api.fetch_hp_id()
 
@@ -69,8 +68,8 @@ async def test_get_chart_data_success(mock_aiohttp_session, mock_api_responses, 
     api.api_token = "test_token"
     api.hp_id = "test_hp_id"
 
-    response = await mock_response(200, mock_api_responses["chart"])
-    mock_aiohttp_session.get = AsyncMock(return_value=response)
+    response = mock_response(200, mock_api_responses["chart"])
+    mock_aiohttp_session.get = MagicMock(return_value=response)
 
     data = await api.get_chart_data()
 
@@ -85,8 +84,8 @@ async def test_get_energy_data_success(mock_aiohttp_session, mock_api_responses,
     api.api_token = "test_token"
     api.hp_id = "test_hp_id"
 
-    response = await mock_response(200, mock_api_responses["energy"])
-    mock_aiohttp_session.get = AsyncMock(return_value=response)
+    response = mock_response(200, mock_api_responses["energy"])
+    mock_aiohttp_session.get = MagicMock(return_value=response)
 
     data = await api.get_energy_data()
 
@@ -106,8 +105,8 @@ async def test_get_json_with_401_invalidates_token(
     api.api_token = "test_token"
     api.hp_id = "test_hp_id"
 
-    response = await mock_response(401, {})
-    mock_aiohttp_session.get = AsyncMock(return_value=response)
+    response = mock_response(401, {})
+    mock_aiohttp_session.get = MagicMock(return_value=response)
 
     data = await api._get_json("http://test.com")
 
@@ -123,8 +122,8 @@ async def test_send_command_success(mock_aiohttp_session, mock_response):
     api.hp_id = "test_hp_id"
     api.version = "v180"
 
-    response = await mock_response(201, {"status": "ok"})
-    mock_aiohttp_session.post = AsyncMock(return_value=response)
+    response = mock_response(201, {"status": "ok"})
+    mock_aiohttp_session.post = MagicMock(return_value=response)
 
     result = await api.send_command(
         "customer_settings", {"auth_p/etat_glob/aut_ch": True}
@@ -142,7 +141,7 @@ async def test_send_command_network_error(mock_aiohttp_session):
     api.hp_id = "test_hp_id"
     api.version = "v180"
 
-    mock_aiohttp_session.post = AsyncMock(
+    mock_aiohttp_session.post = MagicMock(
         side_effect=aiohttp.ClientError("Network error")
     )
 

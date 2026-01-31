@@ -4,7 +4,6 @@ import base64
 import logging
 
 import aiohttp
-
 from homeassistant.exceptions import ConfigEntryNotReady
 
 from .const import (
@@ -57,9 +56,7 @@ class VivrecoApiClient:
         headers = self._headers
         async with self.session.get(API_USER_URL, headers=headers) as response:
             if response.status != 200:
-                raise ConfigEntryNotReady(
-                    f"Erreur utilisateur API: {response.status}"
-                )
+                raise ConfigEntryNotReady(f"Erreur utilisateur API: {response.status}")
             user_data = await response.json()
             hp_ids = user_data.get("hp_id", [])
             if not hp_ids:
@@ -103,7 +100,9 @@ class VivrecoApiClient:
         payload = {"group": group, "values": values, "version": self.version}
 
         try:
-            async with self.session.post(url, headers=headers, json=payload) as response:
+            async with self.session.post(
+                url, headers=headers, json=payload
+            ) as response:
                 if response.status == 401:
                     _LOGGER.warning("Token expiré lors de l'envoi de commande")
                     self.api_token = None

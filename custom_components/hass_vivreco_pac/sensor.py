@@ -78,24 +78,16 @@ async def async_setup_entry(
 
     # Capteurs de durée de fonctionnement
     if config.get("ch", False):
-        sensors.append(
-            VivrecoDurationSensor(coordinator, "ch_duration", "ch")
-        )
+        sensors.append(VivrecoDurationSensor(coordinator, "ch_duration", "ch"))
 
     if config.get("ecs", False):
-        sensors.append(
-            VivrecoDurationSensor(coordinator, "ecs_duration", "ecs")
-        )
+        sensors.append(VivrecoDurationSensor(coordinator, "ecs_duration", "ecs"))
 
     if config.get("raf", False):
-        sensors.append(
-            VivrecoDurationSensor(coordinator, "raf_duration", "raf")
-        )
+        sensors.append(VivrecoDurationSensor(coordinator, "raf_duration", "raf"))
 
     # Durée "other" toujours créée
-    sensors.append(
-        VivrecoDurationSensor(coordinator, "other_duration", "other")
-    )
+    sensors.append(VivrecoDurationSensor(coordinator, "other_duration", "other"))
 
     # Capteur COP (Coefficient de Performance)
     sensors.append(VivrecoCOPSensor(coordinator))

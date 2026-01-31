@@ -1,7 +1,7 @@
 """Coordinator Vivreco PAC API integration."""
 
-from datetime import timedelta
 import logging
+from datetime import timedelta
 
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
@@ -57,27 +57,23 @@ class VivrecoDataUpdateCoordinator(DataUpdateCoordinator):
         if chart_data and "elements" in chart_data:
             self.data = chart_data["elements"]
 
-        if energy_data:
-            energy_values = energy_data.get("values", {}).get("values", {})
+        # Initialiser les valeurs d'énergie par défaut
+        energy_values = energy_data.get("values", {}).get("values", {})
 
-            # Consommation énergétique
-            self.data["energy"] = (
-                energy_values.get("energyValues", {}).get("total", [])
-            )
+        # Consommation énergétique
+        self.data["energy"] = energy_values.get("energyValues", {}).get("total", [])
 
-            # Durées de fonctionnement (en heures)
-            self.data["time_values"] = (
-                energy_values.get("timeValues", {}).get("total", [])
-            )
+        # Durées de fonctionnement (en heures)
+        self.data["time_values"] = energy_values.get("timeValues", {}).get("total", [])
 
-            # COP (Coefficient de Performance)
-            # tableValues.gene[2] contient les COP par période
-            table_values = energy_values.get("tableValues", {})
-            gene_data = table_values.get("gene", [])
-            if len(gene_data) > 2:
-                self.data["cop"] = gene_data[2]
-            else:
-                self.data["cop"] = {}
+        # COP (Coefficient de Performance)
+        # tableValues.gene[2] contient les COP par période
+        table_values = energy_values.get("tableValues", {})
+        gene_data = table_values.get("gene", [])
+        if len(gene_data) > 2:
+            self.data["cop"] = gene_data[2]
+        else:
+            self.data["cop"] = {}
 
         if settings_data and "values" in settings_data:
             settings = settings_data["values"]["values"]

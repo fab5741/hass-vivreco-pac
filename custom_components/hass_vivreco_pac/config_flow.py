@@ -3,7 +3,6 @@
 import logging
 
 import voluptuous as vol
-
 from homeassistant import config_entries
 from homeassistant.const import CONF_EMAIL, CONF_PASSWORD, CONF_SCAN_INTERVAL
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
@@ -92,9 +91,9 @@ class VivrecoOptionsFlow(config_entries.OptionsFlow):
 
         data_schema = vol.Schema(
             {
-                vol.Optional(
-                    CONF_SCAN_INTERVAL, default=current_interval
-                ): vol.All(int, vol.Range(min=1)),
+                vol.Optional(CONF_SCAN_INTERVAL, default=current_interval): vol.All(
+                    int, vol.Range(min=1)
+                ),
             }
         )
 

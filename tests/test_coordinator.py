@@ -1,8 +1,7 @@
 """Tests pour le coordinateur Vivreco."""
 
-from unittest.mock import AsyncMock, MagicMock, patch
-
 import pytest
+from unittest.mock import AsyncMock, MagicMock, patch
 
 from custom_components.hass_vivreco_pac.coordinator import (
     VivrecoDataUpdateCoordinator,

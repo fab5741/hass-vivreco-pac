@@ -1,9 +1,25 @@
 """Fixtures communes pour les tests."""
 
+import pytest
 from unittest.mock import AsyncMock, MagicMock, patch
 
-import pytest
 from homeassistant.core import HomeAssistant
+
+
+class AsyncContextManagerMock:
+    """Mock pour un context manager asynchrone (utilisé pour aiohttp responses)."""
+
+    def __init__(self, return_value):
+        """Initialise le context manager mock."""
+        self.return_value = return_value
+
+    async def __aenter__(self):
+        """Entrée du context manager."""
+        return self.return_value
+
+    async def __aexit__(self, exc_type, exc_val, exc_tb):
+        """Sortie du context manager."""
+        return None
 
 
 @pytest.fixture
@@ -73,7 +89,6 @@ def mock_api_responses():
                 "values": {
                     "auth_p/etat_glob/aut_ch": True,
                     "auth_p/etat_glob/aut_ecs": True,
-                    "auth_p/etat_glob/aut_raf": False,
                     "mode_zone_p/ambiance": "normal",
                     "consigne_p/t_normal_ch": 20.0,
                     "consigne_ecs/t_normal_ecs": 50.0,
@@ -84,13 +99,13 @@ def mock_api_responses():
 
 
 @pytest.fixture
-async def mock_response():
+def mock_response():
     """Mock d'une réponse HTTP."""
 
-    async def _mock_response(status=200, json_data=None):
-        response = AsyncMock()
+    def _mock_response(status=200, json_data=None):
+        response = MagicMock()
         response.status = status
         response.json = AsyncMock(return_value=json_data or {})
-        return response
+        return AsyncContextManagerMock(response)
 
     return _mock_response
