@@ -127,6 +127,18 @@
             "raf_wh": {
                 "name": "Cooling"
             },
+            "ch_duration": {
+                "name": "Heating Duration"
+            },
+            "ecs_duration": {
+                "name": "DHW Duration"
+            },
+            "other_duration": {
+                "name": "Other Duration"
+            },
+            "raf_duration": {
+                "name": "Cooling Duration"
+            },
             "state": {
                 "name": "State",
                 "state": {

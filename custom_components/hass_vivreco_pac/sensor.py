@@ -8,7 +8,7 @@ from homeassistant.components.sensor import (
     SensorStateClass,
 )
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import UnitOfEnergy, UnitOfTemperature
+from homeassistant.const import UnitOfEnergy, UnitOfTemperature, UnitOfTime
 from homeassistant.core import HomeAssistant
 
 from .const import DOMAIN, SENSORS
@@ -74,6 +74,27 @@ async def async_setup_entry(
         VivrecoConsumptionSensor(
             coordinator, "other_wh", "other", SensorDeviceClass.ENERGY
         )
+    )
+
+    # Capteurs de durée de fonctionnement
+    if config.get("ch", False):
+        sensors.append(
+            VivrecoDurationSensor(coordinator, "ch_duration", "ch")
+        )
+
+    if config.get("ecs", False):
+        sensors.append(
+            VivrecoDurationSensor(coordinator, "ecs_duration", "ecs")
+        )
+
+    if config.get("raf", False):
+        sensors.append(
+            VivrecoDurationSensor(coordinator, "raf_duration", "raf")
+        )
+
+    # Durée "other" toujours créée
+    sensors.append(
+        VivrecoDurationSensor(coordinator, "other_duration", "other")
     )
 
     async_add_entities(sensors)
@@ -191,3 +212,42 @@ class VivrecoConsumptionSensor(VivrecoSensor):
     def state(self):
         """Retourne la consommation quotidienne en kWh pour le chauffage (ch)."""
         return self.get_consumption()
+
+
+class VivrecoDurationSensor(VivrecoSensor):
+    """Représentation d'un capteur de durée de fonctionnement Vivreco."""
+
+    def __init__(self, coordinator, sensor_key, duration_type) -> None:
+        """Initialisation du capteur avec un nom et un type de durée spécifique."""
+
+        # Appel du constructeur parent
+        super().__init__(coordinator, sensor_key, SensorDeviceClass.DURATION)
+        self.duration_type = duration_type
+
+    @property
+    def native_unit_of_measurement(self):
+        """Retourne l'unité de mesure (heures pour la durée)."""
+        return UnitOfTime.HOURS
+
+    @property
+    def state_class(self):
+        """Type compteur cumulatif."""
+        return SensorStateClass.TOTAL_INCREASING
+
+    def get_duration(self):
+        """Retourne la durée de fonctionnement pour un type donné (ch, ecs, raf, other)."""
+        # Vérifier que time_values existe et est bien un tableau
+        time_data = self.coordinator.data.get("time_values")
+        if not time_data or not isinstance(time_data, list):
+            return None
+
+        for item in time_data:
+            if item.get("name") == self.duration_type:
+                return item.get("y")
+
+        return None
+
+    @property
+    def state(self):
+        """Retourne la durée totale de fonctionnement en heures."""
+        return self.get_duration()

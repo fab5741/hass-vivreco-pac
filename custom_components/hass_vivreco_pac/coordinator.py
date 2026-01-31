@@ -27,6 +27,7 @@ class VivrecoDataUpdateCoordinator(DataUpdateCoordinator):
             "values": {},
             "labels": {},
             "energy": {},
+            "time_values": {},
             "settings": {},
             "config": {},
         }
@@ -56,11 +57,16 @@ class VivrecoDataUpdateCoordinator(DataUpdateCoordinator):
             self.data = chart_data["elements"]
 
         if energy_data:
+            energy_values = energy_data.get("values", {}).get("values", {})
+
+            # Consommation énergétique
             self.data["energy"] = (
-                energy_data.get("values", {})
-                .get("values", {})
-                .get("energyValues", {})
-                .get("total", [])
+                energy_values.get("energyValues", {}).get("total", [])
+            )
+
+            # Durées de fonctionnement (en heures)
+            self.data["time_values"] = (
+                energy_values.get("timeValues", {}).get("total", [])
             )
 
         if settings_data and "values" in settings_data:

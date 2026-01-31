@@ -127,6 +127,18 @@
             "raf_wh": {
                 "name": "Rafraîchissement"
             },
+            "ch_duration": {
+                "name": "Durée chauffage"
+            },
+            "ecs_duration": {
+                "name": "Durée ECS"
+            },
+            "other_duration": {
+                "name": "Durée autre"
+            },
+            "raf_duration": {
+                "name": "Durée rafraîchissement"
+            },
             "state": {
                 "name": "État",
                 "state": {
