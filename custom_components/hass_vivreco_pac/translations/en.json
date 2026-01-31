@@ -10,6 +10,9 @@
                 "title": "Login to Vivreco WebControl",
                 "description": "Please enter your Vivreco WebControl login credentials"
             }
+        },
+        "error": {
+            "invalid_auth": "Invalid credentials. Please check your email and password."
         }
     },
     "entity": {

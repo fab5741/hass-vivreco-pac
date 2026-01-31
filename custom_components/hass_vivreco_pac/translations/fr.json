@@ -10,6 +10,9 @@
                 "title": "Connexion à Vivreco WebControl",
                 "description": "Veuillez saisir vos identifiants d'accès à Vivreco WebControl"
             }
+        },
+        "error": {
+            "invalid_auth": "Identifiants invalides. Veuillez vérifier votre email et mot de passe."
         }
     },
     "entity": {
