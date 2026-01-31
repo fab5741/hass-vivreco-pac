@@ -97,6 +97,9 @@ async def async_setup_entry(
         VivrecoDurationSensor(coordinator, "other_duration", "other")
     )
 
+    # Capteur COP (Coefficient de Performance)
+    sensors.append(VivrecoCOPSensor(coordinator))
+
     async_add_entities(sensors)
 
 
@@ -251,3 +254,45 @@ class VivrecoDurationSensor(VivrecoSensor):
     def state(self):
         """Retourne la durée totale de fonctionnement en heures."""
         return self.get_duration()
+
+
+class VivrecoCOPSensor(VivrecoBaseEntity, SensorEntity):
+    """Représentation du capteur COP (Coefficient de Performance) Vivreco."""
+
+    def __init__(self, coordinator) -> None:
+        """Initialisation du capteur COP."""
+
+        super().__init__(coordinator)
+        self.coordinator = coordinator
+        self._attr_has_entity_name = True
+        self._attr_translation_key = "cop"
+        self._attr_unique_id = "vivreco_cop"
+        self._attr_device_class = SensorDeviceClass.POWER_FACTOR
+        self._attr_state_class = SensorStateClass.MEASUREMENT
+        self._attr_native_unit_of_measurement = None
+        self._attr_suggested_display_precision = 1
+
+    @property
+    def native_value(self):
+        """Retourne le COP actuel (du jour)."""
+        cop_data = self.coordinator.data.get("cop", {})
+        # Retourne le COP du jour (d), sinon du mois (m), sinon None
+        return cop_data.get("d") or cop_data.get("m")
+
+    @property
+    def extra_state_attributes(self):
+        """Attributs supplémentaires avec les COP par période."""
+        cop_data = self.coordinator.data.get("cop", {})
+        if not cop_data:
+            return {}
+
+        return {
+            "cop_aujourd_hui": cop_data.get("d"),
+            "cop_hier": cop_data.get("d1"),
+            "cop_semaine": cop_data.get("w"),
+            "cop_semaine_derniere": cop_data.get("w1"),
+            "cop_mois": cop_data.get("m"),
+            "cop_mois_dernier": cop_data.get("m1"),
+            "cop_annee": cop_data.get("y"),
+            "cop_annee_derniere": cop_data.get("y1"),
+        }

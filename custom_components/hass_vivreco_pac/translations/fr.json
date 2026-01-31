@@ -139,6 +139,9 @@
             "raf_duration": {
                 "name": "Durée rafraîchissement"
             },
+            "cop": {
+                "name": "COP (Coefficient de Performance)"
+            },
             "state": {
                 "name": "État",
                 "state": {

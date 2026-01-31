@@ -28,6 +28,7 @@ class VivrecoDataUpdateCoordinator(DataUpdateCoordinator):
             "labels": {},
             "energy": {},
             "time_values": {},
+            "cop": {},
             "settings": {},
             "config": {},
         }
@@ -68,6 +69,15 @@ class VivrecoDataUpdateCoordinator(DataUpdateCoordinator):
             self.data["time_values"] = (
                 energy_values.get("timeValues", {}).get("total", [])
             )
+
+            # COP (Coefficient de Performance)
+            # tableValues.gene[2] contient les COP par période
+            table_values = energy_values.get("tableValues", {})
+            gene_data = table_values.get("gene", [])
+            if len(gene_data) > 2:
+                self.data["cop"] = gene_data[2]
+            else:
+                self.data["cop"] = {}
 
         if settings_data and "values" in settings_data:
             settings = settings_data["values"]["values"]

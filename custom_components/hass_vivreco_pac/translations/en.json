@@ -139,6 +139,9 @@
             "raf_duration": {
                 "name": "Cooling Duration"
             },
+            "cop": {
+                "name": "COP (Coefficient of Performance)"
+            },
             "state": {
                 "name": "State",
                 "state": {
