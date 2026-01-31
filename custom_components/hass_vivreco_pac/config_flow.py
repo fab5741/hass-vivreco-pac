@@ -19,6 +19,11 @@ class VivrecoConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
     VERSION = 1
 
+    @staticmethod
+    def async_get_options_flow(config_entry):
+        """Obtenir le flux d'options."""
+        return VivrecoOptionsFlow(config_entry)
+
     async def async_step_user(self, user_input=None):
         """Gérer l'étape initiale."""
 
@@ -61,3 +66,36 @@ class VivrecoConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         return self.async_show_form(
             step_id="user", data_schema=data_schema, errors=errors
         )
+
+
+class VivrecoOptionsFlow(config_entries.OptionsFlow):
+    """Gérer les options de l'intégration Vivreco PAC."""
+
+    def __init__(self, config_entry):
+        """Initialiser le flux d'options."""
+        self.config_entry = config_entry
+
+    async def async_step_init(self, user_input=None):
+        """Gérer les options."""
+        if user_input is not None:
+            # Mettre à jour les données de l'entrée de configuration
+            self.hass.config_entries.async_update_entry(
+                self.config_entry,
+                data={**self.config_entry.data, **user_input},
+            )
+            return self.async_create_entry(title="", data={})
+
+        # Récupérer la valeur actuelle
+        current_interval = self.config_entry.data.get(
+            CONF_SCAN_INTERVAL, DEFAULT_UPDATE_INTERVAL
+        )
+
+        data_schema = vol.Schema(
+            {
+                vol.Optional(
+                    CONF_SCAN_INTERVAL, default=current_interval
+                ): vol.All(int, vol.Range(min=1)),
+            }
+        )
+
+        return self.async_show_form(step_id="init", data_schema=data_schema)

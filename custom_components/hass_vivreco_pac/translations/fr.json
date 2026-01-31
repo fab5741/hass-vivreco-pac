@@ -15,6 +15,17 @@
             "invalid_auth": "Identifiants invalides. Veuillez vérifier votre email et mot de passe."
         }
     },
+    "options": {
+        "step": {
+            "init": {
+                "data": {
+                    "scan_interval": "Fréquence des mises à jour (en minute)"
+                },
+                "title": "Options Vivreco PAC",
+                "description": "Modifier les paramètres de l'intégration"
+            }
+        }
+    },
     "entity": {
         "climate": {
             "climatisation": {
