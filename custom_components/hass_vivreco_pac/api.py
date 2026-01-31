@@ -72,7 +72,7 @@ class VivrecoApiClient:
         url = API_CHART_URL_TEMPLATE.format(hp_id=self.hp_id)
         api_data = await self._get_json(url)
 
-        _LOGGER.debug(f"Données API récupérées: {api_data}.")  # noqa: G004
+        _LOGGER.debug("Données API chart récupérées: %s", api_data)
         return api_data
 
     async def get_energy_data(self) -> dict:
@@ -80,7 +80,7 @@ class VivrecoApiClient:
         url = API_ENERGY_URL_TEMPLATE.format(hp_id=self.hp_id)
         api_data = await self._get_json(url)
 
-        _LOGGER.debug(f"Données API énergie récupérées: {api_data}.")  # noqa: G004
+        _LOGGER.debug("Données API énergie récupérées: %s", api_data)
         return api_data
 
     async def get_settings_data(self) -> dict:
@@ -93,7 +93,7 @@ class VivrecoApiClient:
             self.version = values_section.get("version")
             _LOGGER.debug("Version des settings récupérée : %s", self.version)
 
-        _LOGGER.debug(f"Données API settings récupérées: {api_data}.")  # noqa: G004
+        _LOGGER.debug("Données API settings récupérées: %s", api_data)
         return api_data
 
     async def send_command(self, group: str, values: dict) -> dict:
