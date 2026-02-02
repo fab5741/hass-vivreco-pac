@@ -72,20 +72,20 @@ class VivrecoOptionsFlow(config_entries.OptionsFlow):
 
     def __init__(self, config_entry):
         """Initialiser le flux d'options."""
-        self.config_entry = config_entry
+        self._config_entry = config_entry
 
     async def async_step_init(self, user_input=None):
         """Gérer les options."""
         if user_input is not None:
             # Mettre à jour les données de l'entrée de configuration
             self.hass.config_entries.async_update_entry(
-                self.config_entry,
-                data={**self.config_entry.data, **user_input},
+                self._config_entry,
+                data={**self._config_entry.data, **user_input},
             )
             return self.async_create_entry(title="", data={})
 
         # Récupérer la valeur actuelle
-        current_interval = self.config_entry.data.get(
+        current_interval = self._config_entry.data.get(
             CONF_SCAN_INTERVAL, DEFAULT_UPDATE_INTERVAL
         )
 
