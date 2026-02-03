@@ -7,11 +7,13 @@ import aiohttp
 from homeassistant.exceptions import ConfigEntryNotReady
 
 from .const import (
+    API_CHART_DATA_TEMPLATE,
     API_CHART_URL_TEMPLATE,
     API_ENERGY_URL_TEMPLATE,
     API_LOGIN_URL,
     API_SETTINGS_COMMAND,
     API_SETTINGS_URL_TEMPLATE,
+    API_USAGE_TEMPLATE,
     API_USER_URL,
 )
 
@@ -70,6 +72,22 @@ class VivrecoApiClient:
         api_data = await self._get_json(url)
 
         _LOGGER.debug("Données API chart récupérées: %s", api_data)
+        return api_data
+
+    async def get_chart_data_since1h(self) -> dict:
+        """Récupère les données de type chart depuis 1h."""
+        url = API_CHART_DATA_TEMPLATE.format(hp_id=self.hp_id)
+        api_data = await self._get_json(url)
+
+        _LOGGER.debug("Données API chart since1h récupérées: %s", api_data)
+        return api_data
+
+    async def get_usage_data(self) -> dict:
+        """Récupère les données de type chart."""
+        url = API_USAGE_TEMPLATE.format(hp_id=self.hp_id)
+        api_data = await self._get_json(url)
+
+        _LOGGER.debug("Données API Usage récupérées: %s", api_data)
         return api_data
 
     async def get_energy_data(self) -> dict:

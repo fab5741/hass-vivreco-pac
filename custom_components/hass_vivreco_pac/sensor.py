@@ -8,7 +8,7 @@ from homeassistant.components.sensor import (
     SensorStateClass,
 )
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import UnitOfEnergy, UnitOfTemperature, UnitOfTime
+from homeassistant.const import PERCENTAGE, UnitOfEnergy, UnitOfTemperature, UnitOfTime
 from homeassistant.core import HomeAssistant
 
 from .const import DOMAIN, SENSORS
@@ -91,6 +91,15 @@ async def async_setup_entry(
 
     # Capteur COP (Coefficient de Performance)
     sensors.append(VivrecoCOPSensor(coordinator))
+
+    # Humidité intérieure
+    sensors.append(VivrecoHumiditySensor(coordinator))
+
+    # Usage
+    sensors.append(VivrecoUsageSensor(coordinator))
+
+    # Taux de connexion
+    sensors.append(VivrecoConnectionRateSensor(coordinator))
 
     async_add_entities(sensors)
 
@@ -288,3 +297,86 @@ class VivrecoCOPSensor(VivrecoBaseEntity, SensorEntity):
             "cop_annee": cop_data.get("y"),
             "cop_annee_derniere": cop_data.get("y1"),
         }
+
+
+class VivrecoHumiditySensor(VivrecoBaseEntity, SensorEntity):
+    """Représentation du capteur d'humidité intérieure Vivreco."""
+
+    def __init__(self, coordinator) -> None:
+        """Initialisation du capteur d'humidité intérieure."""
+
+        super().__init__(coordinator)
+        self.coordinator = coordinator
+        self._attr_has_entity_name = True
+        self._attr_translation_key = "indoor_humidity"
+        self._attr_unique_id = "vivreco_humidity"
+        self._attr_device_class = SensorDeviceClass.HUMIDITY
+        self._attr_state_class = SensorStateClass.MEASUREMENT
+        self._attr_native_unit_of_measurement = PERCENTAGE
+        self._attr_suggested_display_precision = 1
+
+    @property
+    def native_value(self):
+        """Retourne l'humidité actuelle."""
+        return self.coordinator.data.get("humidity")
+
+
+class VivrecoUsageSensor(VivrecoBaseEntity, SensorEntity):
+    """Représentation du capteur d'utilisation (Usage) Vivreco."""
+
+    def __init__(self, coordinator) -> None:
+        """Initialisation du capteur Usage."""
+
+        super().__init__(coordinator)
+        self.coordinator = coordinator
+        self._attr_has_entity_name = True
+        self._attr_translation_key = "usage"
+        self._attr_unique_id = "vivreco_usage"
+        self._attr_device_class = None
+        self._attr_state_class = SensorStateClass.MEASUREMENT
+        self._attr_native_unit_of_measurement = PERCENTAGE
+        self._attr_suggested_display_precision = 2
+
+    @property
+    def native_value(self):
+        """Retourne le pourcentage d'arrêt."""
+        usage_data = self.coordinator.data.get("usage", {})
+        return usage_data.get("arret")
+
+    @property
+    def extra_state_attributes(self):
+        """Attributs supplémentaires avec tous les états d'utilisation."""
+        usage_data = self.coordinator.data.get("usage", {})
+        if not usage_data:
+            return {}
+
+        # Créer les attributs en excluant 'arret' (qui est déjà la valeur principale) et 'rate'
+        attributes = {}
+        for key, value in usage_data.items():
+            if key not in ["rate"]:
+                attributes[f"usage_{key}"] = value
+
+        return attributes
+
+
+class VivrecoConnectionRateSensor(VivrecoBaseEntity, SensorEntity):
+    """Représentation du capteur de taux de connexion Vivreco."""
+
+    def __init__(self, coordinator) -> None:
+        """Initialisation du capteur de taux de connexion."""
+
+        super().__init__(coordinator)
+        self.coordinator = coordinator
+        self._attr_has_entity_name = True
+        self._attr_translation_key = "connection_rate"
+        self._attr_unique_id = "vivreco_connection_rate"
+        self._attr_device_class = None
+        self._attr_state_class = SensorStateClass.MEASUREMENT
+        self._attr_native_unit_of_measurement = PERCENTAGE
+        self._attr_suggested_display_precision = 2
+
+    @property
+    def native_value(self):
+        """Retourne le taux de connexion actuel."""
+        usage_data = self.coordinator.data.get("usage", {})
+        return usage_data.get("rate")

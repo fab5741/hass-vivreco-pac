@@ -1,11 +1,12 @@
 """Tests pour le client API Vivreco."""
 
+from unittest.mock import MagicMock
+
 import aiohttp
 import pytest
-from unittest.mock import AsyncMock, MagicMock, patch
+from homeassistant.exceptions import ConfigEntryNotReady
 
 from custom_components.hass_vivreco_pac.api import VivrecoApiClient
-from homeassistant.exceptions import ConfigEntryNotReady
 
 
 @pytest.mark.asyncio
@@ -48,7 +49,9 @@ async def test_login_network_error(mock_aiohttp_session):
 
 
 @pytest.mark.asyncio
-async def test_fetch_hp_id_success(mock_aiohttp_session, mock_api_responses, mock_response):
+async def test_fetch_hp_id_success(
+    mock_aiohttp_session, mock_api_responses, mock_response
+):
     """Test de récupération de l'ID de la PAC."""
     api = VivrecoApiClient("test@example.com", "password", mock_aiohttp_session)
     api.api_token = "test_token"
@@ -62,7 +65,9 @@ async def test_fetch_hp_id_success(mock_aiohttp_session, mock_api_responses, moc
 
 
 @pytest.mark.asyncio
-async def test_get_chart_data_success(mock_aiohttp_session, mock_api_responses, mock_response):
+async def test_get_chart_data_success(
+    mock_aiohttp_session, mock_api_responses, mock_response
+):
     """Test de récupération des données chart."""
     api = VivrecoApiClient("test@example.com", "password", mock_aiohttp_session)
     api.api_token = "test_token"
@@ -78,7 +83,9 @@ async def test_get_chart_data_success(mock_aiohttp_session, mock_api_responses, 
 
 
 @pytest.mark.asyncio
-async def test_get_energy_data_success(mock_aiohttp_session, mock_api_responses, mock_response):
+async def test_get_energy_data_success(
+    mock_aiohttp_session, mock_api_responses, mock_response
+):
     """Test de récupération des données d'énergie."""
     api = VivrecoApiClient("test@example.com", "password", mock_aiohttp_session)
     api.api_token = "test_token"
@@ -97,9 +104,7 @@ async def test_get_energy_data_success(mock_aiohttp_session, mock_api_responses,
 
 
 @pytest.mark.asyncio
-async def test_get_json_with_401_invalidates_token(
-    mock_aiohttp_session, mock_response
-):
+async def test_get_json_with_401_invalidates_token(mock_aiohttp_session, mock_response):
     """Test que le token est invalidé en cas d'erreur 401."""
     api = VivrecoApiClient("test@example.com", "password", mock_aiohttp_session)
     api.api_token = "test_token"
@@ -180,3 +185,42 @@ def test_headers_property_without_token():
     headers = api._headers
 
     assert headers == {}
+
+
+@pytest.mark.asyncio
+async def test_get_chart_data_since1h_success(
+    mock_aiohttp_session, mock_api_responses, mock_response
+):
+    """Test de récupération des données chart depuis 1h."""
+    api = VivrecoApiClient("test@example.com", "password", mock_aiohttp_session)
+    api.api_token = "test_token"
+    api.hp_id = "test_hp_id"
+
+    response = mock_response(200, mock_api_responses["chart_since1h"])
+    mock_aiohttp_session.get = MagicMock(return_value=response)
+
+    data = await api.get_chart_data_since1h()
+
+    assert data == mock_api_responses["chart_since1h"]
+    assert isinstance(data["values"]["hyg"], list)
+    assert data["values"]["hyg"][0] == 45.0
+    mock_aiohttp_session.get.assert_called_once()
+
+
+@pytest.mark.asyncio
+async def test_get_usage_data_success(
+    mock_aiohttp_session, mock_api_responses, mock_response
+):
+    """Test de récupération des données d'usage."""
+    api = VivrecoApiClient("test@example.com", "password", mock_aiohttp_session)
+    api.api_token = "test_token"
+    api.hp_id = "test_hp_id"
+
+    response = mock_response(200, mock_api_responses["usage"])
+    mock_aiohttp_session.get = MagicMock(return_value=response)
+
+    data = await api.get_usage_data()
+
+    assert data == mock_api_responses["usage"]
+    assert data["usage"][0]["name"] == "arret"
+    mock_aiohttp_session.get.assert_called_once()

@@ -29,8 +29,10 @@ class VivrecoDataUpdateCoordinator(DataUpdateCoordinator):
             "energy": {},
             "time_values": {},
             "cop": {},
+            "humidity": {},
             "settings": {},
             "config": {},
+            "usage": {},
         }
 
     @property
@@ -51,6 +53,8 @@ class VivrecoDataUpdateCoordinator(DataUpdateCoordinator):
             await self.api.fetch_hp_id()
 
         chart_data = await self.api.get_chart_data()
+        chart_data_since1h = await self.api.get_chart_data_since1h()
+        usage_data = await self.api.get_usage_data()
         energy_data = await self.api.get_energy_data()
         settings_data = await self.api.get_settings_data()
 
@@ -71,6 +75,26 @@ class VivrecoDataUpdateCoordinator(DataUpdateCoordinator):
         table_values = energy_values.get("tableValues", {})
         gene_data = table_values.get("gene", [])
         self.data["cop"] = gene_data[-1] if gene_data else {}
+
+        # Humidité intérieure
+        self.data["humidity"] = None
+        if (
+            chart_data_since1h
+            and "values" in chart_data_since1h
+            and "hyg" in chart_data_since1h["values"]
+        ):
+            hyg_values = chart_data_since1h["values"]["hyg"]
+            if hyg_values:
+                self.data["humidity"] = hyg_values[-1]
+
+        # Usage data
+        if usage_data and "usage" in usage_data:
+            self.data["usage"] = {
+                item["name"]: round((item["value"] * 100) / 1440, 2)
+                for item in usage_data["usage"]
+            }
+
+            self.data["usage"]["rate"] = usage_data.get("rate", 0)
 
         if settings_data and "values" in settings_data:
             settings = settings_data["values"]["values"]

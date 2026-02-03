@@ -156,6 +156,15 @@
             "cop": {
                 "name": "COP (Coefficient of Performance)"
             },
+            "indoor_humidity": {
+                "name": "Indoor Humidity"
+            },
+            "connection_rate": {
+                "name": "Connection Rate"
+            },
+            "usage": {
+                "name": "PAC Usage"
+            },
             "state": {
                 "name": "State",
                 "state": {

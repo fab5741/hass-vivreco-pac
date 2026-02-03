@@ -1,8 +1,8 @@
 """Fixtures communes pour les tests."""
 
-import pytest
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock, MagicMock
 
+import pytest
 from homeassistant.core import HomeAssistant
 
 
@@ -95,6 +95,25 @@ def mock_api_responses():
                 },
             }
         },
+        "chart_since1h": {
+            "values": {
+                "time": [1770124444882, 1770124504909],
+                "comp_one": [0, 1],
+                "state": ["arret", "bt"],
+                "t_ext": [8.7, 8.6],
+                "t_int": [21.0, 21.0],
+                "t_ecs": [46.2, 46.1],
+                "hyg": [45.0, 44.0],
+            },
+        },
+        "usage": {
+            "usage": [
+                {"name": "arret", "value": 1071},
+                {"name": "ecs", "value": 44},
+                {"name": "bt", "value": 322},
+            ],
+            "rate": 99.79,
+        },
     }
 
 
@@ -109,3 +128,21 @@ def mock_response():
         return AsyncContextManagerMock(response)
 
     return _mock_response
+
+
+@pytest.fixture
+def mock_vivreco_api(mock_api_responses):
+    """Prépare un mock complet de l'API Vivreco."""
+    api = MagicMock()
+    api.api_token = "test_token"
+    api.hp_id = "test_hp_id"
+    api.login = AsyncMock()
+    api.fetch_hp_id = AsyncMock()
+    api.get_chart_data = AsyncMock(return_value=mock_api_responses["chart"])
+    api.get_chart_data_since1h = AsyncMock(
+        return_value=mock_api_responses["chart_since1h"]
+    )
+    api.get_usage_data = AsyncMock(return_value=mock_api_responses["usage"])
+    api.get_energy_data = AsyncMock(return_value=mock_api_responses["energy"])
+    api.get_settings_data = AsyncMock(return_value=mock_api_responses["settings"])
+    return api

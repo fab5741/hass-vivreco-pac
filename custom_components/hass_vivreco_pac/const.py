@@ -19,6 +19,8 @@ API_BASE_URL = "https://vivrecocontrol.com/api/v1"
 API_LOGIN_URL = f"{API_BASE_URL}/herja/login"
 API_USER_URL = f"{API_BASE_URL}/herja/user/me"
 API_CHART_URL_TEMPLATE = f"{API_BASE_URL}/charts/{{hp_id}}/dashboard"
+API_CHART_DATA_TEMPLATE = f"{API_BASE_URL}/charts/{{hp_id}}/data/since1h"
+API_USAGE_TEMPLATE = f"{API_BASE_URL}/charts/{{hp_id}}/usage"
 API_ENERGY_URL_TEMPLATE = f"{API_BASE_URL}/commands/{{hp_id}}/values/energy_meters"
 API_SETTINGS_URL_TEMPLATE = (
     f"{API_BASE_URL}/commands/{{hp_id}}/values/customer_settings"
