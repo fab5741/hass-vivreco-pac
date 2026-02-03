@@ -70,10 +70,7 @@ class VivrecoDataUpdateCoordinator(DataUpdateCoordinator):
         # tableValues.gene[2] contient les COP par période
         table_values = energy_values.get("tableValues", {})
         gene_data = table_values.get("gene", [])
-        if len(gene_data) > 2:
-            self.data["cop"] = gene_data[2]
-        else:
-            self.data["cop"] = {}
+        self.data["cop"] = gene_data[-1] if gene_data else {}
 
         if settings_data and "values" in settings_data:
             settings = settings_data["values"]["values"]
