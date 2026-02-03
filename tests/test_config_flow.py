@@ -1,16 +1,17 @@
 """Tests pour le flux de configuration Vivreco."""
 
-import pytest
 from unittest.mock import AsyncMock, MagicMock, patch
+
+import pytest
+from homeassistant import config_entries
+from homeassistant.const import CONF_EMAIL, CONF_PASSWORD, CONF_SCAN_INTERVAL
+from homeassistant.data_entry_flow import FlowResultType
 
 from custom_components.hass_vivreco_pac.config_flow import (
     VivrecoConfigFlow,
     VivrecoOptionsFlow,
 )
 from custom_components.hass_vivreco_pac.const import DOMAIN
-from homeassistant import config_entries
-from homeassistant.const import CONF_EMAIL, CONF_PASSWORD, CONF_SCAN_INTERVAL
-from homeassistant.data_entry_flow import FlowResultType
 
 
 @pytest.mark.asyncio
@@ -132,7 +133,7 @@ async def test_options_flow_update_scan_interval(hass):
     flow.hass = hass
 
     # Créer un mock pour config_entries
-    mock_update = AsyncMock()
+    mock_update = MagicMock()
     hass.config_entries = MagicMock()
     hass.config_entries.async_update_entry = mock_update
 
