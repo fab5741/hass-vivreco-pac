@@ -5,6 +5,10 @@ Toutes les modifications notables de ce projet seront documentées dans ce fichi
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/),
 et ce projet adhère au [Semantic Versioning](https://semver.org/lang/fr/).
 
+## [2.2] - 2026-02-03
+
+- Correction sur la récupération du COP
+
 ## [2.0.0] - 2026-01-31
 
 ### 🎉 Release majeure - Refactor complet "AI-Ready"
