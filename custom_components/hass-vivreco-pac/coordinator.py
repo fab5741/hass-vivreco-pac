@@ -12,6 +12,8 @@ from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 
 from .const import (
     API_CHART_URL_TEMPLATE,
+    API_COMMANDS_URL_TEMPLATE,
+    API_CUSTOMER_SETTINGS_URL_TEMPLATE,
     API_ENERGY_URL_TEMPLATE,
     API_LOGIN_URL,
     API_USER_URL,
@@ -31,6 +33,8 @@ class VivrecoDataUpdateCoordinator(DataUpdateCoordinator):
         self.password = password
         self.api_token = None
         self.hp_id = None
+        self.customer_settings_version = None
+        self.customer_settings_values = {}
 
         super().__init__(
             hass,
@@ -55,6 +59,10 @@ class VivrecoDataUpdateCoordinator(DataUpdateCoordinator):
         # Si l'identifiant de la PAC n'est pas encore récupéré, essayer de le récupérer
         if not self.hp_id:
             await self._async_fetch_hp_id()
+
+        # Récupérer les customer settings pour les commandes
+        if not self.customer_settings_version:
+            await self._async_fetch_customer_settings()
 
         # Construire l'URL de l'API avec l'identifiant de la PAC
         api_chart_url = API_CHART_URL_TEMPLATE.format(hp_id=self.hp_id)
@@ -179,6 +187,58 @@ class VivrecoDataUpdateCoordinator(DataUpdateCoordinator):
             raise ConfigEntryNotReady(  # noqa: B904
                 "Erreur inconnue lors de la récupération de l'identifiant de la PAC."
             )
+
+    async def _async_fetch_customer_settings(self):
+        """Récupère les settings client pour obtenir version et valeurs."""
+        if not self.api_token or not self.hp_id:
+            return
+
+        headers = {"Authorization": f"Bearer {self.api_token}"}
+        url = API_CUSTOMER_SETTINGS_URL_TEMPLATE.format(hp_id=self.hp_id)
+        try:
+            async with aiohttp.ClientSession() as session:
+                async with session.get(url, headers=headers) as response:
+                    if response.status != 200:
+                        _LOGGER.error(
+                            f"Erreur récupération customer_settings : {response.status}"
+                        )
+                        return
+
+                    data = await response.json()
+                    self.customer_settings_values = data.get("values", {}).get("values", {})
+                    self.customer_settings_version = data.get("values", {}).get("version")
+                    _LOGGER.debug(f"Customer settings version : {self.customer_settings_version}")
+        except Exception as e:
+            _LOGGER.error(f"Erreur récupération customer_settings : {e}")
+
+    async def async_send_command(self, command_type: str, command_value: bool) -> bool:
+        """Envoie une commande à la PAC."""
+        if not self.api_token or not self.hp_id:
+            _LOGGER.error("Token ou hp_id manquant")
+            return False
+
+        url = API_COMMANDS_URL_TEMPLATE.format(hp_id=self.hp_id)
+        headers = {"Authorization": f"Bearer {self.api_token}"}
+        payload = {
+            "group": "customer_settings",
+            "values": {command_type: command_value},
+            "version": self.customer_settings_version
+        }
+
+        try:
+            async with aiohttp.ClientSession() as session:
+                async with session.post(url, headers=headers, json=payload) as resp:
+                    if resp.status == 201:
+                        _LOGGER.debug(f"Commande {command_type}={command_value} envoyée")
+                        self.customer_settings_values[command_type] = command_value
+                        return True
+                    else:
+                        body = await resp.text()
+                        _LOGGER.error(f"Erreur commande {resp.status}: {body}")
+                        return False
+        except Exception as e:
+            _LOGGER.error(f"Erreur envoi commande: {e}")
+            return False
 
     def _generate_basic_auth_header(self):
         """Génère l'en-tête Basic Auth pour la connexion."""
