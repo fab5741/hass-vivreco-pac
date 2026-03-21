@@ -59,25 +59,25 @@ class VivrecoSwitch(VivrecoBaseEntity, SwitchEntity):
 
     async def async_turn_on(self, **kwargs) -> None:
         """Allume le switch via l’API."""
-        values = {self._key: True}
+        # Récupérer tous les settings actuels (l’API exige un payload complet)
+        current_settings = dict(self.coordinator.data.get("settings", {}))
 
-        # logiques exclusives
+        # Appliquer les modifications
+        current_settings[self._key] = True
+
+        # Logiques exclusives
         if self._key == "auth_p/etat_glob/aut_raf":
-            values["auth_p/etat_glob/aut_ch"] = False
+            current_settings["auth_p/etat_glob/aut_ch"] = False
             # valeur pour mode_raf (toujours "normal")
-            values["mode_zone_p/ambiance"] = "normal"
+            current_settings["mode_zone_p/ambiance"] = "normal"
 
         if self._key == "auth_p/etat_glob/aut_ch":
-            values["auth_p/etat_glob/aut_raf"] = False
-            # récupération valeur actuelle depuis le coordinator / select
-            current_zone = self.coordinator.data.get("settings", {}).get(
-                "mode_zone_p/ambiance", "normal"
-            )
-            values["mode_zone_p/ambiance"] = current_zone
+            current_settings["auth_p/etat_glob/aut_raf"] = False
+            # mode_zone_p/ambiance déjà dans current_settings
 
         await self.coordinator.api.send_command(
             group="customer_settings",
-            values=values,
+            values=current_settings,
         )
         await self.coordinator.async_request_refresh()
 
