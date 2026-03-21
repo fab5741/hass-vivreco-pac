@@ -10,6 +10,9 @@ from .const import DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
 
+# Minutes par jour (utilisé pour le calcul du pourcentage d'utilisation)
+MINUTES_PER_DAY = 1440
+
 
 class VivrecoDataUpdateCoordinator(DataUpdateCoordinator):
     """Gère la récupération et la mise à jour des données depuis l'API."""
@@ -71,7 +74,8 @@ class VivrecoDataUpdateCoordinator(DataUpdateCoordinator):
         self.data["time_values"] = energy_values.get("timeValues", {}).get("total", [])
 
         # COP (Coefficient de Performance)
-        # tableValues.gene[2] contient les COP par période
+        # tableValues.gene contient les COP par période (jour, mois, année)
+        # On utilise [-1] pour récupérer la dernière valeur (la plus récente)
         table_values = energy_values.get("tableValues", {})
         gene_data = table_values.get("gene", [])
         self.data["cop"] = gene_data[-1] if gene_data else {}
@@ -90,7 +94,7 @@ class VivrecoDataUpdateCoordinator(DataUpdateCoordinator):
         # Usage data
         if usage_data and "usage" in usage_data:
             self.data["usage"] = {
-                item["name"]: round((item["value"] * 100) / 1440, 2)
+                item["name"]: round((item["value"] * 100) / MINUTES_PER_DAY, 2)
                 for item in usage_data["usage"]
             }
 

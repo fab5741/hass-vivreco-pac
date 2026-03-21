@@ -353,7 +353,7 @@ class VivrecoUsageSensor(VivrecoBaseEntity, SensorEntity):
         # Créer les attributs en excluant 'arret' (qui est déjà la valeur principale) et 'rate'
         attributes = {}
         for key, value in usage_data.items():
-            if key not in ["rate"]:
+            if key not in ["rate", "arret"]:
                 attributes[f"usage_{key}"] = value
 
         return attributes
