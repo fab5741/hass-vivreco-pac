@@ -1,6 +1,7 @@
 """Sensor."""
 
 import logging
+from typing import Any
 
 from homeassistant.components.sensor import (
     SensorDeviceClass,
@@ -12,6 +13,7 @@ from homeassistant.const import PERCENTAGE, UnitOfEnergy, UnitOfTemperature, Uni
 from homeassistant.core import HomeAssistant
 
 from .const import DOMAIN, SENSORS
+from .coordinator import VivrecoDataUpdateCoordinator
 from .entity import VivrecoBaseEntity
 
 _LOGGER = logging.getLogger(__name__)
@@ -67,7 +69,7 @@ async def async_setup_entry(
     async_add_entities(sensors)
 
 
-def _legacy_sensors(coordinator) -> list:
+def _legacy_sensors(coordinator: VivrecoDataUpdateCoordinator) -> list[SensorEntity]:
     """Capteurs pour l'ancienne régulation (format energy_meters réduit)."""
     legacy = coordinator.data.get("legacy_energy", {})
     sensors = [
@@ -88,7 +90,9 @@ def _legacy_sensors(coordinator) -> list:
     return sensors
 
 
-def _energy_sensors(coordinator, config) -> list:
+def _energy_sensors(
+    coordinator: VivrecoDataUpdateCoordinator, config: dict[str, bool]
+) -> list[SensorEntity]:
     """Capteurs d'énergie, de durée et de COP de la régulation récente."""
     sensors = []
     if config.get("ch", False):
@@ -442,8 +446,19 @@ class VivrecoLegacyCounterSensor(VivrecoBaseEntity, SensorEntity):
         "starts": (None, None),
     }
 
-    def __init__(self, coordinator, sensor_key, legacy_key) -> None:
-        """Initialisation du compteur."""
+    def __init__(
+        self,
+        coordinator: VivrecoDataUpdateCoordinator,
+        sensor_key: str,
+        legacy_key: str,
+    ) -> None:
+        """Initialise le compteur.
+
+        Args:
+            coordinator: Coordinateur de données Vivreco.
+            sensor_key: Clé du capteur (translation_key et unique_id).
+            legacy_key: Clé du compteur dans coordinator.data["legacy_energy"].
+        """
         super().__init__(coordinator)
         self._legacy_key = legacy_key
         unit, device_class = self._UNITS[legacy_key]
@@ -460,19 +475,20 @@ class VivrecoLegacyCounterSensor(VivrecoBaseEntity, SensorEntity):
             self._attr_icon = "mdi:counter"
 
     @property
-    def _values(self) -> dict:
+    def _values(self) -> dict[str, Any]:
+        """Valeurs du compteur par période."""
         return (
             self.coordinator.data.get("legacy_energy", {}).get(self._legacy_key) or {}
         )
 
     @property
-    def native_value(self):
+    def native_value(self) -> float | int | None:
         """Cumul depuis la mise en service."""
         return self._values.get("total")
 
     @property
-    def extra_state_attributes(self):
-        """Valeurs par période."""
+    def extra_state_attributes(self) -> dict[str, Any]:
+        """Valeurs par période (jour, semaine, mois, année)."""
         values = self._values
         return {
             name: values.get(period)

@@ -2,6 +2,7 @@
 
 import logging
 from datetime import timedelta
+from typing import Any
 
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
@@ -17,8 +18,17 @@ MINUTES_PER_DAY = 1440
 PERIODS = ("d", "d1", "w", "w1", "m", "m1", "y", "y1", "total")
 
 
-def parse_duration_hours(value):
-    """Convertit une durée Vivreco ("21366h25", "3h", "0h31") en heures décimales."""
+def parse_duration_hours(value: Any) -> float | None:
+    """Convertit une durée Vivreco en heures décimales.
+
+    Args:
+        value: Durée renvoyée par l'API, au format "21366h25", "3h" ou "0h31",
+            ou déjà numérique.
+
+    Returns:
+        Durée en heures arrondie à 2 décimales, ou None si la valeur est
+        absente ou illisible.
+    """
     if value is None:
         return None
     if isinstance(value, (int, float)):
@@ -37,10 +47,17 @@ def parse_duration_hours(value):
     return round(result, 2)
 
 
-def is_legacy_energy_format(energy_values) -> bool:
+def is_legacy_energy_format(energy_values: Any) -> bool:
     """Détecte le format d'energy_meters de l'ancienne régulation (Comfile).
 
-    L'ancienne régulation ne renvoie que tableValues.gene, sans energyValues.
+    L'ancienne régulation (écran bleu) ne renvoie que tableValues.gene,
+    sans energyValues ni timeValues.
+
+    Args:
+        energy_values: Contenu de values.values de la réponse energy_meters.
+
+    Returns:
+        True si la réponse correspond au format de l'ancienne régulation.
     """
     if not isinstance(energy_values, dict):
         return False
@@ -52,17 +69,26 @@ def is_legacy_energy_format(energy_values) -> bool:
     )
 
 
-def parse_legacy_gene(gene) -> dict:
+def parse_legacy_gene(gene: Any) -> dict[str, dict[str, Any]]:
     """Interprète tableValues.gene de l'ancienne régulation.
 
-    Ligne 0 : durée de fonctionnement ("21366h25")
-    Lignes intermédiaires : consommations en kWh (HP puis HC s'il y en a deux)
-    Dernière ligne (si au moins 3 lignes) : nombre de démarrages
+    Structure attendue (cf. issue #8) :
+    - ligne 0 : durée de fonctionnement ("21366h25") ;
+    - lignes intermédiaires : consommations en kWh (HP puis HC s'il y en a deux) ;
+    - dernière ligne (si au moins 3 lignes) : nombre de démarrages.
+
+    Args:
+        gene: Liste tableValues.gene de la réponse energy_meters.
+
+    Returns:
+        Dictionnaire avec les clés duration, energy_total, energy_hp, energy_hc
+        et starts, chacune associant une période (d, d1, w, w1, m, m1, y, y1,
+        total) à sa valeur. Dictionnaire vide si gene est inexploitable.
     """
     if not isinstance(gene, list) or len(gene) < 2:
         return {}
 
-    def row(index):
+    def row(index: int) -> dict[str, Any]:
         item = gene[index] if index < len(gene) else None
         return item if isinstance(item, dict) else {}
 

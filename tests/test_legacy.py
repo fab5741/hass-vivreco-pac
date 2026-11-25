@@ -11,8 +11,8 @@ from custom_components.hass_vivreco_pac.coordinator import (
     parse_legacy_gene,
 )
 from custom_components.hass_vivreco_pac.sensor import (
-    VivrecoCOPSensor,
     VivrecoConsumptionSensor,
+    VivrecoCOPSensor,
     VivrecoLegacyCounterSensor,
     async_setup_entry,
 )
@@ -86,6 +86,7 @@ LEGACY_ENERGY = {
         (12, 12.0),
         (None, None),
         ("n/a", None),
+        ("xxh10", None),
     ],
 )
 def test_parse_duration_hours(raw, expected):
@@ -101,6 +102,7 @@ def test_legacy_format_detection(mock_api_responses):
         is False
     )
     assert is_legacy_energy_format({}) is False
+    assert is_legacy_energy_format(None) is False
 
 
 def test_parse_legacy_gene():
@@ -112,6 +114,19 @@ def test_parse_legacy_gene():
     assert parsed["energy_total"]["total"] == 55902
     assert parsed["energy_total"]["d"] == 7.428
     assert parsed["starts"]["total"] == 62183.0
+
+
+def test_parse_legacy_gene_edge_cases():
+    """Listes trop courtes ou à deux lignes (Durée, Conso)."""
+    assert parse_legacy_gene([]) == {}
+    assert parse_legacy_gene(None) == {}
+
+    parsed = parse_legacy_gene([{"total": "10h30"}, {"total": 42, "d": "?"}])
+    assert parsed["duration"]["total"] == 10.5
+    assert parsed["energy_total"]["total"] == 42
+    assert parsed["energy_total"]["d"] is None
+    assert parsed["energy_hc"] == {}
+    assert parsed["starts"] == {}
 
 
 @pytest.fixture
@@ -130,6 +145,7 @@ def legacy_api(mock_api_responses):
     return api
 
 
+@pytest.mark.asyncio
 async def test_coordinator_legacy_has_no_cop(hass, legacy_api):
     """Le nombre de démarrages ne doit plus être pris pour le COP (issue #15)."""
     coordinator = VivrecoDataUpdateCoordinator(hass, update_interval=5)
@@ -142,6 +158,7 @@ async def test_coordinator_legacy_has_no_cop(hass, legacy_api):
     assert coordinator.data["legacy_energy"]["starts"]["total"] == 62183.0
 
 
+@pytest.mark.asyncio
 async def test_coordinator_recent_format_unchanged(hass, mock_vivreco_api):
     """La régulation récente garde le COP en dernière ligne de gene."""
     coordinator = VivrecoDataUpdateCoordinator(hass, update_interval=5)
@@ -166,6 +183,7 @@ async def _setup_sensors(hass, api):
     return added
 
 
+@pytest.mark.asyncio
 async def test_legacy_sensors_created(hass, legacy_api):
     """Ancienne régulation : compteurs globaux, sans COP ni détail par usage."""
     sensors = await _setup_sensors(hass, legacy_api)
@@ -195,6 +213,7 @@ async def test_legacy_sensors_created(hass, legacy_api):
     assert legacy["vivreco_operating_time"].suggested_display_precision is None
 
 
+@pytest.mark.asyncio
 async def test_recent_sensors_unchanged(hass, mock_vivreco_api):
     """Régulation récente : pas de compteur « ancienne régulation »."""
     sensors = await _setup_sensors(hass, mock_vivreco_api)
