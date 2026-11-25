@@ -189,6 +189,11 @@ async def test_legacy_sensors_created(hass, legacy_api):
     assert legacy["vivreco_compressor_starts"].native_value == 62183.0
     assert legacy["vivreco_energy_hp"].extra_state_attributes["mois"] == 27
 
+    # Affichage : compteurs sans décimales, durée avec décimales
+    assert legacy["vivreco_compressor_starts"].suggested_display_precision == 0
+    assert legacy["vivreco_energy_total"].suggested_display_precision == 0
+    assert legacy["vivreco_operating_time"].suggested_display_precision is None
+
 
 async def test_recent_sensors_unchanged(hass, mock_vivreco_api):
     """Régulation récente : pas de compteur « ancienne régulation »."""

@@ -453,6 +453,9 @@ class VivrecoLegacyCounterSensor(VivrecoBaseEntity, SensorEntity):
         self._attr_native_unit_of_measurement = unit
         self._attr_device_class = device_class
         self._attr_state_class = SensorStateClass.TOTAL_INCREASING
+        # Compteurs entiers (kWh, démarrages) ; la durée garde ses décimales
+        if legacy_key != "duration":
+            self._attr_suggested_display_precision = 0
         if legacy_key == "starts":
             self._attr_icon = "mdi:counter"
 
