@@ -153,6 +153,21 @@
             "raf_duration": {
                 "name": "Cooling Duration"
             },
+            "energy_total": {
+                "name": "Total consumption"
+            },
+            "energy_hp": {
+                "name": "Peak-hours consumption"
+            },
+            "energy_hc": {
+                "name": "Off-peak consumption"
+            },
+            "operating_time": {
+                "name": "Operating time"
+            },
+            "compressor_starts": {
+                "name": "Number of starts"
+            },
             "cop": {
                 "name": "COP (Coefficient of Performance)"
             },

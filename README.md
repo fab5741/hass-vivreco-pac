@@ -24,6 +24,14 @@ Cette intégration récupère les données de fonctionnement et de température 
   - Mesure l'efficacité énergétique de votre PAC
   - Historique par jour, semaine, mois, année
 
+### Ancienne régulation (Comfile, écran bleu)
+Ces PAC ne remontent ni le détail par usage ni le COP. L'intégration le détecte automatiquement et crée à la place des compteurs globaux :
+- ⚡ Consommation totale (compatible tableau de bord Énergie), heures pleines et heures creuses
+- ⏱️ Durée de fonctionnement
+- 🔢 Nombre de démarrages
+
+Les valeurs par période (jour, semaine, mois, année) sont disponibles en attributs.
+
 ### Contrôles
 - ⚙️ Entité **Climate** pour chauffage/rafraîchissement
 - 🚿 Entité **Water Heater** pour ballon ECS

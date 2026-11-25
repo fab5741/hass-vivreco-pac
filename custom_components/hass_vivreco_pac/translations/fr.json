@@ -153,6 +153,21 @@
             "raf_duration": {
                 "name": "Durée rafraîchissement"
             },
+            "energy_total": {
+                "name": "Consommation totale"
+            },
+            "energy_hp": {
+                "name": "Consommation heures pleines"
+            },
+            "energy_hc": {
+                "name": "Consommation heures creuses"
+            },
+            "operating_time": {
+                "name": "Durée de fonctionnement"
+            },
+            "compressor_starts": {
+                "name": "Nombre de démarrages"
+            },
             "cop": {
                 "name": "COP (Coefficient de Performance)"
             },

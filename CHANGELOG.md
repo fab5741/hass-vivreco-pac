@@ -5,6 +5,15 @@ Toutes les modifications notables de ce projet seront documentées dans ce fichi
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/),
 et ce projet adhère au [Semantic Versioning](https://semver.org/lang/fr/).
 
+## [Non publié]
+
+### Ajouté
+- Prise en charge de l'ancienne régulation Comfile (écran bleu) : consommation totale, heures pleines, heures creuses, durée de fonctionnement et nombre de démarrages (#8)
+
+### Corrigé
+- Sur l'ancienne régulation, le nombre de démarrages n'est plus affiché comme COP (#15)
+- Les capteurs par usage et le COP, toujours « Inconnu » sur l'ancienne régulation, ne sont plus créés
+
 ## [2.3] - 2026-02-03
 
 - Récupération du capteur d'humidité intérieure
