@@ -49,7 +49,7 @@ Ce projet adhère au code de conduite de la communauté Home Assistant. En parti
 
 ### Prérequis
 
-- Python 3.11 ou supérieur
+- Python 3.14 (les versions récentes de Home Assistant, et donc les tests, l'exigent)
 - Home Assistant (pour tester l'intégration)
 - Git
 

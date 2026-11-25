@@ -12,8 +12,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # 3.11 : Home Assistant 2024.x ; 3.13 : versions récentes de Home Assistant
-        python-version: ["3.11", "3.13"]
+        # Chaque version de Python fixe la version de Home Assistant installée
+        # par pytest-homeassistant-custom-component :
+        # 3.13 -> Home Assistant 2026.2 ; 3.14 -> Home Assistant le plus récent
+        python-version: ["3.13", "3.14"]
 
     steps:
       - uses: actions/checkout@v4
