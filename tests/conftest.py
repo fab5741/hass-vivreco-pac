@@ -4,6 +4,7 @@ from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers import frame
 
 
 class AsyncContextManagerMock:
@@ -27,6 +28,12 @@ async def hass():
     """Fixture Home Assistant."""
     hass_instance = HomeAssistant("/tmp/hass-test")
     hass_instance.data = {}
+    # Les versions récentes de Home Assistant exigent l'initialisation du helper
+    # « frame » (utilisé notamment par DataUpdateCoordinator). La fonction
+    # n'existe pas dans les anciennes versions, d'où le getattr.
+    frame_setup = getattr(frame, "async_setup", None)
+    if frame_setup is not None:
+        frame_setup(hass_instance)
     await hass_instance.async_start()
     yield hass_instance
     await hass_instance.async_stop()
