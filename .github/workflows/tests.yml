@@ -9,14 +9,21 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # Chaque version de Python fixe la version de Home Assistant installée
+        # par pytest-homeassistant-custom-component :
+        # 3.13 -> Home Assistant 2026.2 ; 3.14 -> Home Assistant le plus récent
+        python-version: ["3.13", "3.14"]
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Python
+      - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
+          python-version: ${{ matrix.python-version }}
 
       - name: Install dependencies
         run: |

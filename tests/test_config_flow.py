@@ -3,9 +3,9 @@
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
-from homeassistant import config_entries
 from homeassistant.const import CONF_EMAIL, CONF_PASSWORD, CONF_SCAN_INTERVAL
 from homeassistant.data_entry_flow import FlowResultType
+from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.hass_vivreco_pac.config_flow import (
     VivrecoConfigFlow,
@@ -88,9 +88,8 @@ async def test_config_flow_invalid_credentials(hass):
 async def test_options_flow_init_step_shows_form(hass):
     """Test que le flux d'options affiche le formulaire."""
     # Créer une entrée de configuration mockée
-    mock_entry = config_entries.ConfigEntry(
+    mock_entry = MockConfigEntry(
         version=1,
-        minor_version=0,
         domain=DOMAIN,
         title="Vivreco PAC",
         data={
@@ -98,7 +97,6 @@ async def test_options_flow_init_step_shows_form(hass):
             CONF_PASSWORD: "password",
             CONF_SCAN_INTERVAL: 5,
         },
-        source="user",
         entry_id="test_entry_id",
     )
 
@@ -115,9 +113,8 @@ async def test_options_flow_init_step_shows_form(hass):
 async def test_options_flow_update_scan_interval(hass):
     """Test de modification de l'intervalle de scan."""
     # Créer une entrée de configuration mockée
-    mock_entry = config_entries.ConfigEntry(
+    mock_entry = MockConfigEntry(
         version=1,
-        minor_version=0,
         domain=DOMAIN,
         title="Vivreco PAC",
         data={
@@ -125,7 +122,6 @@ async def test_options_flow_update_scan_interval(hass):
             CONF_PASSWORD: "password",
             CONF_SCAN_INTERVAL: 5,
         },
-        source="user",
         entry_id="test_entry_id",
     )
 
@@ -146,9 +142,8 @@ async def test_options_flow_update_scan_interval(hass):
 @pytest.mark.asyncio
 async def test_options_flow_shows_current_value(hass):
     """Test que le flux d'options affiche la valeur actuelle."""
-    mock_entry = config_entries.ConfigEntry(
+    mock_entry = MockConfigEntry(
         version=1,
-        minor_version=0,
         domain=DOMAIN,
         title="Vivreco PAC",
         data={
@@ -156,7 +151,6 @@ async def test_options_flow_shows_current_value(hass):
             CONF_PASSWORD: "password",
             CONF_SCAN_INTERVAL: 7,
         },
-        source="user",
         entry_id="test_entry_id",
     )
 
