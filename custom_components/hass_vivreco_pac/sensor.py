@@ -48,6 +48,49 @@ async def async_setup_entry(
             VivrecoTemperatureSensor(coordinator, key, SensorDeviceClass.TEMPERATURE)
         )
 
+    if coordinator.data.get("legacy"):
+        # Ancienne régulation (Comfile) : pas de détail par usage ni de COP,
+        # seulement des compteurs globaux (durée, conso HP/HC, démarrages).
+        sensors.extend(_legacy_sensors(coordinator))
+    else:
+        sensors.extend(_energy_sensors(coordinator, config))
+
+    # Humidité intérieure
+    sensors.append(VivrecoHumiditySensor(coordinator))
+
+    # Usage
+    sensors.append(VivrecoUsageSensor(coordinator))
+
+    # Taux de connexion
+    sensors.append(VivrecoConnectionRateSensor(coordinator))
+
+    async_add_entities(sensors)
+
+
+def _legacy_sensors(coordinator) -> list:
+    """Capteurs pour l'ancienne régulation (format energy_meters réduit)."""
+    legacy = coordinator.data.get("legacy_energy", {})
+    sensors = [
+        VivrecoLegacyCounterSensor(coordinator, "energy_total", "energy_total"),
+        VivrecoLegacyCounterSensor(coordinator, "operating_time", "duration"),
+    ]
+    if legacy.get("energy_hc"):
+        sensors.append(
+            VivrecoLegacyCounterSensor(coordinator, "energy_hp", "energy_hp")
+        )
+        sensors.append(
+            VivrecoLegacyCounterSensor(coordinator, "energy_hc", "energy_hc")
+        )
+    if legacy.get("starts"):
+        sensors.append(
+            VivrecoLegacyCounterSensor(coordinator, "compressor_starts", "starts")
+        )
+    return sensors
+
+
+def _energy_sensors(coordinator, config) -> list:
+    """Capteurs d'énergie, de durée et de COP de la régulation récente."""
+    sensors = []
     if config.get("ch", False):
         sensors.append(
             VivrecoConsumptionSensor(
@@ -91,17 +134,7 @@ async def async_setup_entry(
 
     # Capteur COP (Coefficient de Performance)
     sensors.append(VivrecoCOPSensor(coordinator))
-
-    # Humidité intérieure
-    sensors.append(VivrecoHumiditySensor(coordinator))
-
-    # Usage
-    sensors.append(VivrecoUsageSensor(coordinator))
-
-    # Taux de connexion
-    sensors.append(VivrecoConnectionRateSensor(coordinator))
-
-    async_add_entities(sensors)
+    return sensors
 
 
 class VivrecoSensor(VivrecoBaseEntity, SensorEntity):
@@ -380,3 +413,66 @@ class VivrecoConnectionRateSensor(VivrecoBaseEntity, SensorEntity):
         """Retourne le taux de connexion actuel."""
         usage_data = self.coordinator.data.get("usage", {})
         return usage_data.get("rate")
+
+
+LEGACY_PERIOD_ATTRIBUTES = {
+    "d": "aujourd_hui",
+    "d1": "hier",
+    "w": "semaine",
+    "w1": "semaine_derniere",
+    "m": "mois",
+    "m1": "mois_dernier",
+    "y": "annee",
+    "y1": "annee_derniere",
+}
+
+
+class VivrecoLegacyCounterSensor(VivrecoBaseEntity, SensorEntity):
+    """Compteur global de l'ancienne régulation (Comfile, écran bleu).
+
+    La valeur est le cumul depuis la mise en service ("total") ; les autres
+    périodes (jour, semaine, mois, année) sont exposées en attributs.
+    """
+
+    _UNITS = {
+        "energy_total": (UnitOfEnergy.KILO_WATT_HOUR, SensorDeviceClass.ENERGY),
+        "energy_hp": (UnitOfEnergy.KILO_WATT_HOUR, SensorDeviceClass.ENERGY),
+        "energy_hc": (UnitOfEnergy.KILO_WATT_HOUR, SensorDeviceClass.ENERGY),
+        "duration": (UnitOfTime.HOURS, SensorDeviceClass.DURATION),
+        "starts": (None, None),
+    }
+
+    def __init__(self, coordinator, sensor_key, legacy_key) -> None:
+        """Initialisation du compteur."""
+        super().__init__(coordinator)
+        self._legacy_key = legacy_key
+        unit, device_class = self._UNITS[legacy_key]
+        self._attr_has_entity_name = True
+        self._attr_translation_key = sensor_key
+        self._attr_unique_id = f"vivreco_{sensor_key}"
+        self._attr_native_unit_of_measurement = unit
+        self._attr_device_class = device_class
+        self._attr_state_class = SensorStateClass.TOTAL_INCREASING
+        if legacy_key == "starts":
+            self._attr_icon = "mdi:counter"
+
+    @property
+    def _values(self) -> dict:
+        return (
+            self.coordinator.data.get("legacy_energy", {}).get(self._legacy_key) or {}
+        )
+
+    @property
+    def native_value(self):
+        """Cumul depuis la mise en service."""
+        return self._values.get("total")
+
+    @property
+    def extra_state_attributes(self):
+        """Valeurs par période."""
+        values = self._values
+        return {
+            name: values.get(period)
+            for period, name in LEGACY_PERIOD_ATTRIBUTES.items()
+            if values.get(period) is not None
+        }
